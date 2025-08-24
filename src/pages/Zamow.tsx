@@ -58,17 +58,23 @@ const Zamow = () => {
     
     // Simulate calculation delay for better UX
     setTimeout(() => {
-      let result: PackagingResult;
-      
-      if (material === 'glass') {
-        const requiredKg = debouncedArea * PRICING.glass.consumption;
-        result = computePackaging(requiredKg, debouncedArea, true); // VAT always applied
-      } else {
-        result = computeMarblePackaging(debouncedArea, true); // VAT always applied
+      try {
+        let result: PackagingResult;
+        
+        if (material === 'glass') {
+          const requiredKg = debouncedArea * PRICING.glass.consumption;
+          result = computePackaging(requiredKg, debouncedArea, true); // VAT always applied
+        } else {
+          result = computeMarblePackaging(debouncedArea, true); // VAT always applied
+        }
+        
+        setResults(result);
+      } catch (error) {
+        console.error('Calculation error:', error);
+        setResults(null);
+      } finally {
+        setIsCalculating(false);
       }
-      
-      setResults(result);
-      setIsCalculating(false);
     }, 200);
   }, [debouncedArea, material, validateInputs]);
 
@@ -82,6 +88,7 @@ const Zamow = () => {
   }, [debouncedArea, material, calculate, validateInputs]);
 
   const formatCurrency = (amount: number) => {
+    if (typeof amount !== 'number' || isNaN(amount)) return '0.00 PLN';
     return `${amount.toFixed(2)} PLN`;
   };
 
@@ -216,38 +223,38 @@ const Zamow = () => {
               </div>
             )}
 
-            {showResults && (
+            {showResults && results && (
               <div aria-live="polite">
                 <div className="result-item">
                   <span className="result-label">Szacowane zużycie:</span>
-                  <span className="result-value">{results.totalKg} kg</span>
+                  <span className="result-value">{results.totalKg || 0} kg</span>
                 </div>
 
                 {material === 'glass' && (
                   <div className="result-item">
                     <span className="result-label">Sugerowane opakowania:</span>
-                    <span className="result-value">{formatPackaging(results.n20, results.n5, results.n1)}</span>
+                    <span className="result-value">{formatPackaging(results.n20 || 0, results.n5 || 0, results.n1 || 0)}</span>
                   </div>
                 )}
 
                 <div className="result-item">
                   <span className="result-label">Cena (NETTO):</span>
-                  <span className="result-value">{formatCurrency(results.materialNet)}</span>
+                  <span className="result-value">{formatCurrency(results.materialNet || 0)}</span>
                 </div>
 
                 <div className="result-item">
                   <span className="result-label">VAT (23%):</span>
-                  <span className="result-value">{formatCurrency(results.vat)}</span>
+                  <span className="result-value">{formatCurrency(results.vat || 0)}</span>
                 </div>
 
                 <div className="result-item total">
                   <span className="result-label">Razem (BRUTTO):</span>
-                  <span className="result-value">{formatCurrency(results.brutto)}</span>
+                  <span className="result-value">{formatCurrency(results.brutto || 0)}</span>
                 </div>
 
                 <div className="result-item">
                   <span className="result-label">Cena za m²:</span>
-                  <span className="result-value">{formatCurrency(results.pricePerM2)}</span>
+                  <span className="result-value">{formatCurrency(results.pricePerM2 || 0)}</span>
                 </div>
 
                 <div className="calculator-actions">
