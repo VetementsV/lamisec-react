@@ -3,95 +3,115 @@ import './Szklo.css';
 
 const Szklo = () => {
   return (
-    <div className="szklo-page">
-      <div className="container">
-        <div className="breadcrumb">
-          <Link to="/">Strona główna</Link> / 
-          <Link to="/produkty">Produkty</Link> / 
-          <span>Ochrona szkła/okien</span>
-        </div>
-        
+    <div className="szklo">
+      <div className="szklo-container">
         <div className="page-header">
           <h1>LamiSec – ochrona szkła/okien</h1>
-          <p>Specjalistyczny materiał ochronny do zabezpieczania powierzchni szklanych</p>
+          <p>
+            Profesjonalny materiał ochronny przeznaczony do zabezpieczania powierzchni szklanych. 
+            Zapewnia długotrwałą ochronę przed zarysowaniami i zanieczyszczeniami.
+          </p>
         </div>
-        
-        <div className="product-blocks">
-          <div className="product-block">
-            <div className="block-image">
-              <img src="/images/szklo.jpg" alt="Ochrona szkła" />
-            </div>
-            <div className="block-content">
-              <h3>Opis produktu</h3>
-              <p>
-                Specjalistyczny materiał ochronny przeznaczony do zabezpieczania 
-                powierzchni szklanych. Zapewnia długotrwałą ochronę przed 
-                zarysowaniami i zanieczyszczeniami.
-              </p>
-              <ul className="product-benefits">
-                <li>Wysoka przyczepność do powierzchni szklanych</li>
-                <li>Łatwe usuwanie bez pozostawiania śladów</li>
-                <li>Odporność na wilgoć i zmiany temperatury</li>
-                <li>Przezroczystość zachowująca estetykę</li>
-              </ul>
-              <Link to="/zamow" className="btn btn-primary">Oblicz koszty</Link>
-            </div>
+
+        <div className="product-overview">
+          <div className="product-image">
+            <img src="/images/szklo1.jpg" alt="LamiSec - ochrona szkła/okien" />
           </div>
-          
-          <div className="product-block reverse">
-            <div className="block-content">
-              <h3>Korzyści i zalety</h3>
-              <p>
-                Nasz materiał ochronny do szkła wyróżnia się unikalnymi właściwościami, 
-                które zapewniają maksymalną ochronę przy minimalnych kosztach.
-              </p>
-              <ul className="product-benefits">
-                <li>Zużycie: 80-100 g/m² (średnio 90 g/m²)</li>
-                <li>Dostępne opakowania: 1kg, 5kg, 20kg</li>
-                <li>Przezroczystość zachowująca estetykę</li>
-                <li>Ochrona przed zarysowaniami</li>
-              </ul>
-            </div>
-            <div className="block-image">
-              <img src="/images/szklo2.jpg" alt="Korzyści ochrony szkła" />
-            </div>
-          </div>
-          
-          <div className="product-block">
-            <div className="block-image">
-              <img src="/images/szklo3.jpg" alt="Zastosowania ochrony szkła" />
-            </div>
-            <div className="block-content">
-              <h3>Zastosowania</h3>
-              <p>
-                Materiał LamiSec do szkła znajduje zastosowanie w wielu branżach, 
-                gdzie wymagana jest ochrona delikatnych powierzchni szklanych.
-              </p>
-              <ul className="product-benefits">
-                <li>Ochrona podczas prac budowlanych</li>
-                <li>Zabezpieczenie w przemyśle</li>
-                <li>Ochrona okien i fasad</li>
-                <li>Zabezpieczenie podczas transportu</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        <div className="product-cta">
-          <div className="cta-content">
-            <h3>Gotowy do zamówienia?</h3>
+          <div className="product-info">
+            <h2>Ochrona Szkła i Okien</h2>
             <p>
-              Skorzystaj z naszego kalkulatora, aby obliczyć koszty dla Twojej powierzchni, 
-              lub wybierz szybki zakup bez obliczania.
+              LamiSec to specjalistyczny materiał ochronny, który tworzy niewidzialną warstwę 
+              zabezpieczającą powierzchnie szklane przed uszkodzeniami mechanicznymi, 
+              zanieczyszczeniami i wpływami atmosferycznymi.
             </p>
-            <div className="cta-buttons">
+            <ul className="product-features">
+              <li>Zużycie: 80-100 g/m² (średnio 90 g/m²)</li>
+              <li>Wysoka przyczepność do powierzchni szklanych</li>
+              <li>Łatwe usuwanie bez pozostawiania śladów</li>
+              <li>Odporność na wilgoć i promieniowanie UV</li>
+              <li>Przezroczystość zachowująca estetykę</li>
+            </ul>
+            <div className="product-cta">
               <Link to="/zamow" className="btn btn-primary">
                 Oblicz koszty
               </Link>
-              <Link to="/szybki-zakup" className="btn btn-secondary">
+              <Link to="/szybki-zakup" className="btn btn-outline">
                 Szybki zakup
               </Link>
             </div>
+          </div>
+        </div>
+
+        <div className="product-details">
+          <div className="details-container">
+            <div className="details-grid">
+              <div className="detail-card">
+                <h3>Zastosowanie</h3>
+                <p>
+                  Idealny do ochrony okien, drzwi szklanych, witryn sklepowych, 
+                  balustrad, mebli szklanych oraz innych powierzchni szklanych 
+                  w budownictwie i przemyśle.
+                </p>
+              </div>
+              <div className="detail-card">
+                <h3>Korzyści</h3>
+                <p>
+                  Zmniejsza ryzyko uszkodzeń podczas transportu, montażu i użytkowania. 
+                  Ułatwia czyszczenie i utrzymanie powierzchni w idealnym stanie.
+                </p>
+              </div>
+              <div className="detail-card">
+                <h3>Trwałość</h3>
+                <p>
+                  Materiał pozostaje skuteczny przez cały okres montażu i może być 
+                  łatwo usunięty po zakończeniu prac bez uszkodzenia powierzchni.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="applications">
+          <div className="applications-container">
+            <h2>Główne Zastosowania</h2>
+            <div className="applications-grid">
+              <div className="application-item">
+                <i className="fas fa-building"></i>
+                <h4>Budownictwo</h4>
+                <p>Ochrona okien i drzwi podczas budowy i remontów</p>
+              </div>
+              <div className="application-item">
+                <i className="fas fa-store"></i>
+                <h4>Handel</h4>
+                <p>Witryny sklepowe i wystawy</p>
+              </div>
+              <div className="application-item">
+                <i className="fas fa-home"></i>
+                <h4>Mieszkania</h4>
+                <p>Balkony, tarasy i elementy wykończeniowe</p>
+              </div>
+              <div className="application-item">
+                <i className="fas fa-industry"></i>
+                <h4>Przemysł</h4>
+                <p>Maszyny i urządzenia z elementami szklanymi</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="cta-section">
+          <h2>Gotowy do Zamówienia?</h2>
+          <p>
+            Skorzystaj z naszego kalkulatora, aby obliczyć dokładne koszty materiałów 
+            dla Twojego projektu, lub skontaktuj się z nami po indywidualną wycenę.
+          </p>
+          <div className="cta-buttons">
+            <Link to="/zamow" className="btn btn-primary">
+              Oblicz koszty
+            </Link>
+            <Link to="/kontakt" className="btn btn-outline">
+              Skontaktuj się
+            </Link>
           </div>
         </div>
       </div>
