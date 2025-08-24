@@ -1,18 +1,58 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { computePackaging, computeMarblePackaging } from '../lib/packaging';
 import type { PackagingResult } from '../lib/packaging';
 import { PRICING } from '../lib/pricing';
 import './Zamow.css';
+
+// Debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 const Zamow = () => {
   const [area, setArea] = useState<number>(1);
   const [material, setMaterial] = useState<'glass' | 'marble'>('glass');
   const [results, setResults] = useState<PackagingResult | null>(null);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [validationError, setValidationError] = useState<string>('');
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const calculate = () => {
-    if (area < 0.1) return;
+  // Debounce area input to prevent thrashing
+  const debouncedArea = useDebounce(area, 300);
+
+  // Validation function
+  const validateInputs = useCallback(() => {
+    if (!debouncedArea || debouncedArea <= 0) {
+      setValidationError('Podaj powierzchnię w m²');
+      return false;
+    }
+    if (debouncedArea > 10000) {
+      setValidationError('Powierzchnia nie może przekraczać 10 000 m²');
+      return false;
+    }
+    if (!material) {
+      setValidationError('Wybierz produkt');
+      return false;
+    }
+    setValidationError('');
+    return true;
+  }, [debouncedArea, material]);
+
+  // Calculate function
+  const calculate = useCallback(() => {
+    if (!validateInputs()) return;
     
     setIsCalculating(true);
     
@@ -21,31 +61,25 @@ const Zamow = () => {
       let result: PackagingResult;
       
       if (material === 'glass') {
-        const requiredKg = area * PRICING.glass.consumption;
-        result = computePackaging(requiredKg, area, true); // VAT always applied
+        const requiredKg = debouncedArea * PRICING.glass.consumption;
+        result = computePackaging(requiredKg, debouncedArea, true); // VAT always applied
       } else {
-        result = computeMarblePackaging(area, true); // VAT always applied
+        result = computeMarblePackaging(debouncedArea, true); // VAT always applied
       }
       
       setResults(result);
       setIsCalculating(false);
-      
-      // Smooth scroll to results
-      if (resultsRef.current) {
-        resultsRef.current.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }, 300);
-  };
+    }, 200);
+  }, [debouncedArea, material, validateInputs]);
 
   // Auto-calculate when inputs change
   useEffect(() => {
-    if (area >= 0.1) {
+    if (validateInputs()) {
       calculate();
+    } else {
+      setResults(null);
     }
-  }, [area, material]);
+  }, [debouncedArea, material, calculate, validateInputs]);
 
   const formatCurrency = (amount: number) => {
     return `${amount.toFixed(2)} PLN`;
@@ -60,7 +94,7 @@ const Zamow = () => {
   };
 
   const handleCheckout = async () => {
-    if (!results) return;
+    if (!results || !validateInputs()) return;
     
     try {
       const response = await fetch('/api/checkout', {
@@ -70,7 +104,7 @@ const Zamow = () => {
         },
         body: JSON.stringify({
           product: material === 'glass' ? 'szklo' : 'marmur',
-          areaM2: area,
+          areaM2: debouncedArea,
         }),
       });
 
@@ -88,6 +122,15 @@ const Zamow = () => {
     }
   };
 
+  const scrollToResults = () => {
+    if (resultsRef.current) {
+      resultsRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   const getInfoNote = () => {
     if (material === 'glass') {
       return 'Zakres zużycia szkła: 80–100 g/m² (używamy 90 g/m²)';
@@ -96,12 +139,15 @@ const Zamow = () => {
     }
   };
 
+  const isFormValid = validateInputs();
+  const showResults = results && isFormValid;
+
   return (
     <div className="zamow">
       <div className="container">
         <div className="page-header">
-          <h1>Kalkulator Kosztów</h1>
-          <p>Oblicz koszty materiałów ochronnych na podstawie powierzchni</p>
+          <h1>Zamów online</h1>
+          <p>Kup LamiSec na podstawie wprowadzonej powierzchni – cena obliczana automatycznie.</p>
         </div>
 
         <div className="calculator-container">
@@ -117,8 +163,14 @@ const Zamow = () => {
                 value={area}
                 onChange={(e) => setArea(parseFloat(e.target.value) || 0)}
                 placeholder="Wprowadź powierzchnię"
-                className="form-input"
+                className={`form-input ${validationError && !isFormValid ? 'error' : ''}`}
+                aria-describedby={validationError ? 'validation-hint' : undefined}
               />
+              {validationError && (
+                <div id="validation-hint" className="validation-hint show" role="alert">
+                  {validationError}
+                </div>
+              )}
             </div>
 
             <div className="form-group">
@@ -134,26 +186,14 @@ const Zamow = () => {
               </select>
             </div>
 
-            <button
-              type="button"
-              onClick={calculate}
-              disabled={area < 0.1 || isCalculating}
-              className="btn btn-primary calculate-btn"
-            >
-              {isCalculating ? 'Obliczam...' : 'Oblicz koszty'}
-            </button>
-
             <div className="form-info">
               <div className="info-item">
                 <i className="fas fa-info-circle"></i>
                 <span>{getInfoNote()}</span>
               </div>
               <div className="info-item">
-                <i className="fas fa-industry"></i>
-                <span>
-                  Ceny hurtowe dostępne po negocjacji. 
-                  <a href="/kontakt">Skontaktuj się z nami</a>.
-                </span>
+                <i className="fas fa-calculator"></i>
+                <span>Kalkulacja aktualizuje się automatycznie po wprowadzeniu danych</span>
               </div>
             </div>
           </div>
@@ -162,19 +202,31 @@ const Zamow = () => {
           <div className="calculator-results" ref={resultsRef}>
             <h3>Wyniki obliczeń</h3>
             
-            {results ? (
-              <>
+            {isCalculating && (
+              <div className="no-results">
+                <i className="fas fa-spinner fa-spin"></i>
+                <p>Obliczam...</p>
+              </div>
+            )}
+
+            {!isCalculating && !showResults && (
+              <div className="no-results">
+                <i className="fas fa-calculator"></i>
+                <p>Wprowadź powierzchnię i wybierz produkt, aby zobaczyć wyniki</p>
+              </div>
+            )}
+
+            {showResults && (
+              <div aria-live="polite">
                 <div className="result-item">
-                  <span className="result-label">Szacowane zużycie (kg):</span>
+                  <span className="result-label">Szacowane zużycie:</span>
                   <span className="result-value">{results.totalKg} kg</span>
                 </div>
 
                 {material === 'glass' && (
                   <div className="result-item">
                     <span className="result-label">Sugerowane opakowania:</span>
-                    <span className="result-value">
-                      {formatPackaging(results.n20, results.n5, results.n1)}
-                    </span>
+                    <span className="result-value">{formatPackaging(results.n20, results.n5, results.n1)}</span>
                   </div>
                 )}
 
@@ -202,16 +254,13 @@ const Zamow = () => {
                   <button
                     type="button"
                     onClick={handleCheckout}
+                    disabled={!isFormValid}
+                    aria-disabled={!isFormValid}
                     className="btn btn-primary checkout-btn"
                   >
                     Przejdź do płatności
                   </button>
                 </div>
-              </>
-            ) : (
-              <div className="no-results">
-                <i className="fas fa-calculator"></i>
-                <p>Wprowadź powierzchnię i wybierz materiał, aby zobaczyć wyniki</p>
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
@@ -6,6 +6,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const menuRef = useRef<HTMLUListElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,12 +18,55 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  // Close menu on route change
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname]);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        closeMenu();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Lock body scroll
+      document.body.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.classList.remove('no-scroll');
+    };
+  }, [isOpen]);
+
+  const openMenu = () => {
+    setIsOpen(true);
+    // Focus first interactive element in menu
+    setTimeout(() => {
+      const firstLink = menuRef.current?.querySelector('a');
+      firstLink?.focus();
+    }, 100);
   };
 
   const closeMenu = () => {
     setIsOpen(false);
+    // Return focus to burger button
+    burgerRef.current?.focus();
+  };
+
+  const toggleMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   };
 
   const isActive = (path: string) => {
@@ -41,33 +86,71 @@ const Navbar = () => {
           />
         </Link>
         
-        <button className="navbar-toggle" onClick={toggleMenu}>
+        <button 
+          ref={burgerRef}
+          className="navbar-toggle" 
+          onClick={toggleMenu}
+          aria-expanded={isOpen}
+          aria-controls="mobile-menu"
+          aria-label={isOpen ? 'Zamknij menu' : 'Otwórz menu'}
+          type="button"
+        >
           <i className={`fas fa-${isOpen ? 'times' : 'bars'}`}></i>
         </button>
         
-        <ul className={`navbar-nav ${isOpen ? 'open' : ''}`}>
-          <li>
-            <Link to="/" onClick={closeMenu} className={isActive('/') ? 'active' : ''}>
+        <ul 
+          ref={menuRef}
+          id="mobile-menu"
+          className={`navbar-nav ${isOpen ? 'open' : ''}`}
+          role="menu"
+        >
+          <li role="none">
+            <Link 
+              to="/" 
+              onClick={closeMenu} 
+              className={isActive('/') ? 'active' : ''}
+              role="menuitem"
+            >
               Strona główna
             </Link>
           </li>
-          <li>
-            <Link to="/produkty" onClick={closeMenu} className={isActive('/produkty') ? 'active' : ''}>
+          <li role="none">
+            <Link 
+              to="/produkty" 
+              onClick={closeMenu} 
+              className={isActive('/produkty') ? 'active' : ''}
+              role="menuitem"
+            >
               Produkty
             </Link>
           </li>
-          <li>
-            <Link to="/technologia" onClick={closeMenu} className={isActive('/technologia') ? 'active' : ''}>
+          <li role="none">
+            <Link 
+              to="/technologia" 
+              onClick={closeMenu} 
+              className={isActive('/technologia') ? 'active' : ''}
+              role="menuitem"
+            >
               Technologia
             </Link>
           </li>
-          <li>
-            <Link to="/zamow" onClick={closeMenu} className={isActive('/zamow') ? 'active' : ''}>
+          <li role="none">
+            <Link 
+              to="/zamow" 
+              onClick={closeMenu} 
+              className={isActive('/zamow') ? 'active' : ''}
+              role="menuitem"
+            >
               Zamów
             </Link>
           </li>
-          <li>
-            <Link to="/kontakt" onClick={closeMenu} className={isActive('/kontakt') ? 'active' : ''}>
+          <li role="none">
+            <Link 
+              to="/kontakt" 
+              onClick={closeMenu} 
+              className={isActive('/kontakt') ? 'active' : ''}
+              role="menuitem"
+            >
               Kontakt
             </Link>
           </li>
