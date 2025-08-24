@@ -1,0 +1,386 @@
+.szybki-zakup {
+  padding-top: 100px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header h1 {
+  font-size: 3rem;
+  color: #000;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.quick-buy-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.product-section {
+  margin-bottom: 4rem;
+}
+
+.product-section h2 {
+  font-size: 2rem;
+  color: #000;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Product Cards */
+.product-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.product-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header h3 {
+  font-size: 1.5rem;
+  color: #000;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.price {
+  font-size: 1.1rem;
+  color: #2e84a7;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Quantity Controls */
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.quantity-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e9ecef;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2e84a7;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  border-color: #2e84a7;
+  background: #2e84a7;
+  color: #fff;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #000;
+  min-width: 30px;
+  text-align: center;
+}
+
+.total-price {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2e84a7;
+  margin: 0;
+}
+
+/* Marble Card */
+.marble-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.marble-card .card-header h3 {
+  font-size: 1.5rem;
+  color: #000;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.marble-card .price {
+  font-size: 1.1rem;
+  color: #2e84a7;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.marble-card .quantity-controls {
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.marble-card .quantity-controls label {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.5rem;
+}
+
+.quantity-input {
+  width: 100px;
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #2e84a7;
+  box-shadow: 0 0 0 3px rgba(46, 132, 167, 0.1);
+}
+
+/* Summary Sections */
+.glass-summary,
+.marble-summary {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 16px;
+  border-left: 4px solid #2e84a7;
+  margin-top: 2rem;
+}
+
+.glass-summary h3,
+.marble-summary h4 {
+  font-size: 1.3rem;
+  color: #000;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.summary-details {
+  margin-bottom: 1.5rem;
+}
+
+.summary-details p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+  color: #666;
+  font-size: 1rem;
+}
+
+.summary-details p:last-child {
+  border-bottom: none;
+}
+
+.summary-details p.total {
+  border-top: 2px solid #2e84a7;
+  border-bottom: none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #000;
+}
+
+.summary-details strong {
+  color: #000;
+}
+
+.summary-details .total strong {
+  color: #2e84a7;
+  font-size: 1.2rem;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+/* VAT Toggle */
+.vat-toggle {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Checkbox Styles (reused from Zamow.css) */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #000;
+}
+
+.form-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 20px;
+  width: 20px;
+  background-color: #fff;
+  border: 2px solid #e9ecef;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.checkbox-label:hover .checkmark {
+  border-color: #2e84a7;
+}
+
+.form-checkbox:checked ~ .checkmark {
+  background-color: #2e84a7;
+  border-color: #2e84a7;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.form-checkbox:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .szybki-zakup {
+    padding-top: 80px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .quick-buy-container {
+    padding: 0 16px;
+  }
+  
+  .product-cards {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .product-card,
+  .marble-card {
+    padding: 1.5rem;
+  }
+  
+  .glass-summary,
+  .marble-summary {
+    padding: 1.5rem;
+  }
+  
+  .quantity-controls {
+    gap: 0.75rem;
+  }
+  
+  .quantity-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+  
+  .quantity-input {
+    width: 80px;
+    padding: 0.625rem;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .page-header p {
+    font-size: 1rem;
+  }
+  
+  .product-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .product-card,
+  .marble-card {
+    padding: 1rem;
+  }
+  
+  .glass-summary,
+  .marble-summary {
+    padding: 1rem;
+  }
+  
+  .summary-details p {
+    font-size: 0.9rem;
+  }
+}

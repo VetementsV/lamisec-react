@@ -1,0 +1,309 @@
+.technologia-page {
+  padding-top: 100px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.page-header h1 {
+  font-size: 3rem;
+  color: #000;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Technology Steps */
+.tech-map {
+  max-width: 1000px;
+  margin: 0 auto 4rem;
+  padding: 0 24px;
+}
+
+.tech-step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tech-step:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.step-number {
+  background: #2e84a7;
+  color: #fff;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-content {
+  padding: 2rem;
+  flex: 1;
+}
+
+.step-content h3 {
+  font-size: 1.5rem;
+  color: #000;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.step-content p {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.step-details {
+  list-style: none;
+  padding: 0;
+}
+
+.step-details li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+  color: #666;
+  font-size: 1rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.step-details li:before {
+  content: '→';
+  color: #2e84a7;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+}
+
+.step-details li:last-child {
+  border-bottom: none;
+}
+
+/* Technology Notes */
+.tech-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto 4rem;
+  padding: 0 24px;
+}
+
+.note-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #2e84a7;
+}
+
+.note-card h3 {
+  font-size: 1.3rem;
+  color: #000;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.note-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.note-card li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+  color: #666;
+  font-size: 1rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.note-card li:before {
+  content: '•';
+  color: #2e84a7;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+}
+
+.note-card li:last-child {
+  border-bottom: none;
+}
+
+/* CTA Section */
+.tech-cta {
+  background: #fff;
+  padding: 4rem 0;
+  margin-top: 2rem;
+}
+
+.tech-cta h3 {
+  font-size: 2rem;
+  color: #000;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.tech-cta p {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-buttons .btn {
+  min-width: 180px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .technologia-page {
+    padding-top: 80px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .tech-map {
+    padding: 0 16px;
+  }
+  
+  .tech-step {
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+  
+  .step-number {
+    width: 100%;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  
+  .step-content {
+    padding: 1.5rem;
+  }
+  
+  .step-content h3 {
+    font-size: 1.3rem;
+  }
+  
+  .step-content p {
+    font-size: 1rem;
+  }
+  
+  .tech-notes {
+    padding: 0 16px;
+    gap: 1.5rem;
+  }
+  
+  .note-card {
+    padding: 1.5rem;
+  }
+  
+  .note-card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .tech-cta h3 {
+    font-size: 1.75rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cta-buttons .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .page-header p {
+    font-size: 1rem;
+  }
+  
+  .step-content {
+    padding: 1rem;
+  }
+  
+  .step-content h3 {
+    font-size: 1.2rem;
+  }
+  
+  .step-content p {
+    font-size: 0.9rem;
+  }
+  
+  .step-details li {
+    font-size: 0.9rem;
+    padding: 0.4rem 0 0.4rem 1.25rem;
+  }
+  
+  .note-card {
+    padding: 1rem;
+  }
+  
+  .note-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .note-card li {
+    font-size: 0.9rem;
+    padding: 0.4rem 0 0.4rem 1.25rem;
+  }
+  
+  .tech-cta h3 {
+    font-size: 1.5rem;
+  }
+  
+  .tech-cta p {
+    font-size: 1rem;
+  }
+}
