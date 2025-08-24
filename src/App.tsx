@@ -6,7 +6,6 @@ import Szklo from './pages/Szklo';
 import Marmur from './pages/Marmur';
 import Technologia from './pages/Technologia';
 import Zamow from './pages/Zamow';
-import SzybkiZakup from './pages/SzybkiZakup';
 import Kontakt from './pages/Kontakt';
 import Sukces from './pages/Sukces';
 import Anulowano from './pages/Anulowano';
@@ -25,7 +24,6 @@ function App() {
             <Route path="/produkty/marmur" element={<Marmur />} />
             <Route path="/technologia" element={<Technologia />} />
             <Route path="/zamow" element={<Zamow />} />
-            <Route path="/szybki-zakup" element={<SzybkiZakup />} />
             <Route path="/kontakt" element={<Kontakt />} />
             <Route path="/sukces" element={<Sukces />} />
             <Route path="/anulowano" element={<Anulowano />} />

@@ -82,9 +82,6 @@ const Produkty = () => {
               <Link to="/kontakt" className="btn btn-primary">
                 Skontaktuj się z nami
               </Link>
-              <Link to="/szybki-zakup" className="btn btn-secondary">
-                Szybki zakup
-              </Link>
             </div>
           </div>
         </div>

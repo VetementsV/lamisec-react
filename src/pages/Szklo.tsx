@@ -35,9 +35,6 @@ const Szklo = () => {
               <Link to="/zamow" className="btn btn-primary">
                 Oblicz koszty
               </Link>
-              <Link to="/szybki-zakup" className="btn btn-outline">
-                Szybki zakup
-              </Link>
             </div>
           </div>
         </div>

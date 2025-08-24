@@ -84,13 +84,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-  background: var(--primary-color);
-  color: var(--background);
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
   box-shadow: var(--shadow);
 }
 
 .btn-primary:hover {
-  background: var(--primary-dark);
+  background: var(--primary-dark) !important;
+  color: #ffffff !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
 }

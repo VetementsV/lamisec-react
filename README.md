@@ -4,12 +4,12 @@ Nowoczesna aplikacja React dla firmy LamiSec, oferująca profesjonalne materiał
 
 ## 🚀 Funkcjonalności
 
-- **Strona główna** z hero section i przeglądem produktów
-- **Kalkulator kosztów** z automatycznym obliczaniem opakowań
-- **Szybki zakup** bez obliczania powierzchni
-- **Integracja ze Stripe** dla bezpiecznych płatności online
-- **Responsywny design** dla wszystkich urządzeń
-- **Polski interfejs** z profesjonalną terminologią
+- **Strona główna** z hero section i produktami
+- **Produkty** - szczegółowe informacje o szkło i marmur
+- **Technologia** - karta technologiczna
+- **Zamów online** - kalkulator kosztów z automatycznym pakowaniem
+- **Kontakt** - informacje kontaktowe
+- **Stripe Checkout** - bezpieczne płatności online
 
 ## 🛠️ Technologie
 
@@ -120,12 +120,11 @@ src/
 │   └── packaging.ts    # Algorytm pakowania
 ├── pages/               # Strony aplikacji
 │   ├── Home.tsx        # Strona główna
-│   ├── Zamow.tsx       # Kalkulator/kalkulacja
-│   ├── SzybkiZakup.tsx # Szybki zakup
 │   ├── Produkty.tsx    # Przegląd produktów
 │   ├── Szklo.tsx       # Szczegóły szkła
 │   ├── Marmur.tsx      # Szczegóły marmuru
 │   ├── Technologia.tsx # Karta technologiczna
+│   ├── Zamow.tsx       # Kalkulator/kalkulacja
 │   ├── Kontakt.tsx     # Informacje kontaktowe
 │   ├── Sukces.tsx      # Potwierdzenie płatności
 │   └── Anulowano.tsx   # Anulowana płatność
