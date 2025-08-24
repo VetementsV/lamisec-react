@@ -24,16 +24,33 @@
 }
 
 .navbar-logo {
-  height: 32px;
+  height: 40px;
   width: auto;
-  max-height: 32px;
+  max-height: 40px;
+  border: 2px solid red; /* Debug border */
 }
 
 .navbar-logo img {
-  height: 32px !important;
+  height: 40px !important;
   width: auto !important;
-  max-height: 32px !important;
+  max-height: 40px !important;
   display: block;
+  border: 2px solid blue; /* Debug border */
+}
+
+.navbar .navbar-logo {
+  height: 40px !important;
+  width: auto !important;
+  max-height: 40px !important;
+  border: 2px solid red; /* Debug border */
+}
+
+.navbar .navbar-logo img {
+  height: 40px !important;
+  width: auto !important;
+  max-height: 40px !important;
+  display: block !important;
+  border: 2px solid blue; /* Debug border */
 }
 
 .navbar-nav {
