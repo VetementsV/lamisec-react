@@ -29,6 +29,13 @@
   max-height: 18px;
 }
 
+.navbar-logo img {
+  height: 18px !important;
+  width: auto !important;
+  max-height: 18px !important;
+  display: block;
+}
+
 .navbar-nav {
   display: flex;
   list-style: none;
