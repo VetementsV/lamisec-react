@@ -24,15 +24,15 @@
 }
 
 .navbar-logo {
-  height: 22px;
+  height: 28px;
   width: auto;
-  max-height: 22px;
+  max-height: 28px;
 }
 
 .navbar-logo img {
-  height: 22px !important;
+  height: 28px !important;
   width: auto !important;
-  max-height: 22px !important;
+  max-height: 28px !important;
   display: block;
 }
 
