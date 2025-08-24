@@ -39,18 +39,27 @@
 }
 
 .navbar .navbar-logo {
-  height: 40px !important;
+  height: 28px !important;
   width: auto !important;
-  max-height: 40px !important;
+  max-height: 28px !important;
   border: 2px solid red; /* Debug border */
 }
 
 .navbar .navbar-logo img {
-  height: 40px !important;
+  height: 28px !important;
   width: auto !important;
-  max-height: 40px !important;
+  max-height: 28px !important;
   display: block !important;
   border: 2px solid blue; /* Debug border */
+}
+
+/* Even more specific override */
+.navbar .navbar-container .navbar-logo img {
+  height: 28px !important;
+  width: auto !important;
+  max-height: 28px !important;
+  display: block !important;
+  border: 2px solid green; /* Different debug border */
 }
 
 .navbar-nav {

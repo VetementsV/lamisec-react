@@ -35,7 +35,11 @@ const Navbar = () => {
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <Link to="/" className="navbar-logo" onClick={closeMenu}>
-          <img src="/images/Lamisec_white_logo.png" alt="LamiSec" />
+          <img 
+            src="/images/Lamisec_white_logo.png" 
+            alt="LamiSec" 
+            style={{ height: '28px', width: 'auto', maxHeight: '28px' }}
+          />
         </Link>
         
         <button className="navbar-toggle" onClick={toggleMenu}>
