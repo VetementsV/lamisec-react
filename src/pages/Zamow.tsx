@@ -7,7 +7,6 @@ import './Zamow.css';
 const Zamow = () => {
   const [area, setArea] = useState<number>(1);
   const [material, setMaterial] = useState<'glass' | 'marble'>('glass');
-  const [includeVAT, setIncludeVAT] = useState<boolean>(true);
   const [results, setResults] = useState<PackagingResult | null>(null);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -23,9 +22,9 @@ const Zamow = () => {
       
       if (material === 'glass') {
         const requiredKg = area * PRICING.glass.consumption;
-        result = computePackaging(requiredKg, area, includeVAT);
+        result = computePackaging(requiredKg, area, true); // VAT always applied
       } else {
-        result = computeMarblePackaging(area, includeVAT);
+        result = computeMarblePackaging(area, true); // VAT always applied
       }
       
       setResults(result);
@@ -46,7 +45,7 @@ const Zamow = () => {
     if (area >= 0.1) {
       calculate();
     }
-  }, [area, material, includeVAT]);
+  }, [area, material]);
 
   const formatCurrency = (amount: number) => {
     return `${amount.toFixed(2)} PLN`;
@@ -72,7 +71,6 @@ const Zamow = () => {
         body: JSON.stringify({
           product: material,
           area_m2: area,
-          includeVAT: includeVAT,
         }),
       });
 
@@ -85,6 +83,14 @@ const Zamow = () => {
     } catch (error) {
       console.error('Checkout error:', error);
       alert('Błąd połączenia. Sprawdź połączenie internetowe i spróbuj ponownie.');
+    }
+  };
+
+  const getInfoNote = () => {
+    if (material === 'glass') {
+      return 'Zakres zużycia szkła: 80–100 g/m² (używamy 90 g/m²)';
+    } else {
+      return 'Zużycie marmuru: 350 g/m² (używamy 350 g/m²)';
     }
   };
 
@@ -126,19 +132,6 @@ const Zamow = () => {
               </select>
             </div>
 
-            <div className="form-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={includeVAT}
-                  onChange={(e) => setIncludeVAT(e.target.checked)}
-                  className="form-checkbox"
-                />
-                <span className="checkmark"></span>
-                Uwzględnij VAT 23%
-              </label>
-            </div>
-
             <button
               type="button"
               onClick={calculate}
@@ -151,9 +144,7 @@ const Zamow = () => {
             <div className="form-info">
               <div className="info-item">
                 <i className="fas fa-info-circle"></i>
-                <span>
-                  Zakres zużycia szkła: 80–100 g/m² (używamy 90 g/m²)
-                </span>
+                <span>{getInfoNote()}</span>
               </div>
               <div className="info-item">
                 <i className="fas fa-industry"></i>
@@ -190,12 +181,10 @@ const Zamow = () => {
                   <span className="result-value">{formatCurrency(results.materialNet)}</span>
                 </div>
 
-                {includeVAT && (
-                  <div className="result-item">
-                    <span className="result-label">VAT (23%):</span>
-                    <span className="result-value">{formatCurrency(results.vat)}</span>
-                  </div>
-                )}
+                <div className="result-item">
+                  <span className="result-label">VAT (23%):</span>
+                  <span className="result-value">{formatCurrency(results.vat)}</span>
+                </div>
 
                 <div className="result-item total">
                   <span className="result-label">Razem (BRUTTO):</span>

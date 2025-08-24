@@ -1,20 +1,16 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
 });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { product, area_m2, includeVAT, quick, n1, n5, n20, kg } = req.body;
+    const { product, area_m2, quick, n1, n5, n20, kg } = req.body;
 
     // Input validation
     if (!product || (product !== 'szklo' && product !== 'marble')) {
@@ -23,6 +19,7 @@ export default async function handler(
 
     let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     let metadata: Record<string, any> = {};
+    let computedData: any = {};
 
     if (quick) {
       // Quick buy flow
@@ -34,7 +31,12 @@ export default async function handler(
           return res.status(400).json({ error: 'No products selected' });
         }
 
-        // Add glass products to line items
+        // Calculate NET prices (VAT will be added by Stripe)
+        const materialNet = (quantities.n1 * 60) + (quantities.n5 * 250) + (quantities.n20 * 720);
+        const vat = materialNet * 0.23;
+        const brutto = materialNet + vat;
+
+        // Add glass products to line items (using BRUTTO prices)
         if (quantities.n1 > 0) {
           lineItems.push({
             price_data: {
@@ -43,7 +45,7 @@ export default async function handler(
                 name: 'LamiSec Glass 1kg',
                 description: 'LamiSec - ochrona szkła/okien, 1kg',
               },
-              unit_amount: includeVAT ? 74 : 60, // 60 PLN + 23% VAT = 74 PLN
+              unit_amount: Math.round(74 * 100), // 74 PLN (60 + 23% VAT) in grosze
             },
             quantity: quantities.n1,
           });
@@ -57,7 +59,7 @@ export default async function handler(
                 name: 'LamiSec Glass 5kg',
                 description: 'LamiSec - ochrona szkła/okien, 5kg',
               },
-              unit_amount: includeVAT ? 62 : 50, // 50 PLN + 23% VAT = 62 PLN
+              unit_amount: Math.round(62 * 100), // 62 PLN (50 + 23% VAT) in grosze
             },
             quantity: quantities.n5,
           });
@@ -71,7 +73,7 @@ export default async function handler(
                 name: 'LamiSec Glass 20kg',
                 description: 'LamiSec - ochrona szkła/okien, 20kg',
               },
-              unit_amount: includeVAT ? 44 : 36, // 36 PLN + 23% VAT = 44 PLN
+              unit_amount: Math.round(44 * 100), // 44 PLN (36 + 23% VAT) in grosze
             },
             quantity: quantities.n20,
           });
@@ -85,10 +87,24 @@ export default async function handler(
           totalKg,
           quick: true,
         };
+
+        computedData = {
+          kgRequired: totalKg,
+          packaging: { n20: quantities.n20, n5: quantities.n5, n1: quantities.n1 },
+          net: materialNet,
+          vat: vat,
+          brutto: brutto,
+          pricePerM2: 0, // Not applicable for quick buy
+          product: 'glass'
+        };
       } else if (quick === 'marble') {
         if (!kg || kg <= 0) {
           return res.status(400).json({ error: 'Invalid marble quantity' });
         }
+
+        const materialNet = kg * 85;
+        const vat = materialNet * 0.23;
+        const brutto = materialNet + vat;
 
         lineItems.push({
           price_data: {
@@ -97,66 +113,86 @@ export default async function handler(
               name: 'LamiSec Marble Protektor',
               description: 'LamiSec - protektor (marmur)',
             },
-            unit_amount: includeVAT ? 105 : 85, // 85 PLN + 23% VAT = 105 PLN
+            unit_amount: Math.round(105 * 100), // 105 PLN (85 + 23% VAT) in grosze
           },
-          quantity: Math.ceil(kg),
+          quantity: kg,
         });
 
         metadata = {
           product: 'marble',
-          kg: Math.ceil(kg),
+          kg,
           quick: true,
+        };
+
+        computedData = {
+          kgRequired: kg,
+          packaging: { n20: 0, n5: 0, n1: 0 },
+          net: materialNet,
+          vat: vat,
+          brutto: brutto,
+          pricePerM2: materialNet / kg,
+          product: 'marble'
         };
       }
     } else {
-      // Area-based calculation flow
+      // Area-based calculation
       if (!area_m2 || area_m2 < 0.1 || area_m2 > 50000) {
         return res.status(400).json({ error: 'Invalid area' });
       }
 
-      if (typeof includeVAT !== 'boolean') {
-        return res.status(400).json({ error: 'Invalid VAT flag' });
-      }
-
-      // Calculate packaging and pricing (this should match client-side logic)
-      let materialNet = 0;
-      let totalKg = 0;
-      let n20 = 0, n5 = 0, n1 = 0;
-
       if (product === 'szklo') {
-        const consumption = 0.09; // 90 g/m²
-        const requiredKg = Math.ceil(area_m2 * consumption);
-        totalKg = requiredKg;
-
-        // Simplified packaging algorithm (should match client-side)
-        n20 = Math.floor(requiredKg / 20);
-        const rem = requiredKg - (20 * n20);
+        // Glass packaging calculation
+        const requiredKg = area_m2 * 0.09; // 90 g/m²
+        const req = Math.ceil(requiredKg);
         
-        if (rem > 0) {
-          if (rem <= 5) {
-            n5 = 1;
-          } else if (rem <= 10) {
-            n5 = 2;
-          } else if (rem <= 15) {
-            n5 = 3;
+        // Start with 20kg buckets
+        const n20 = Math.floor(req / 20);
+        const rem = req - (20 * n20);
+        
+        let n5 = 0;
+        let n1 = 0;
+        
+        if (rem === 0) {
+          // Perfect fit with 20kg buckets
+          n5 = 0;
+          n1 = 0;
+        } else {
+          // Evaluate options for remaining kg
+          const optionA = evaluateOptionA(rem);
+          const optionB = evaluateOptionB(rem);
+          const optionC = evaluateOptionC(rem);
+          
+          // Pick the cheapest option
+          const cheapest = Math.min(optionA.cost, optionB.cost, optionC.cost);
+          
+          if (cheapest === optionC.cost) {
+            // Option C: extra 20kg bucket
+            n5 = 0;
+            n1 = 0;
+            // n20 will be incremented below
+          } else if (cheapest === optionA.cost) {
+            // Option A: 5kg + 1kg buckets
+            n5 = optionA.n5;
+            n1 = optionA.n1;
           } else {
-            n20 += 1;
+            // Option B: only 5kg buckets
+            n5 = optionB.n5;
+            n1 = 0;
           }
         }
+        
+        // If we chose option C, increment n20
+        const finalN20 = n20 + (n5 === 0 && n1 === 0 && rem > 0 ? 1 : 0);
+        const totalKg = (finalN20 * 20) + (n5 * 5) + n1;
+        
+        // Calculate costs (NET)
+        const materialNet = (finalN20 * 720) + (n5 * 250) + (n1 * 60);
+        const vat = materialNet * 0.23;
+        const brutto = materialNet + vat;
+        const pricePerM2 = area_m2 > 0 ? materialNet / area_m2 : 0;
 
-        materialNet = (n20 * 36 * 20) + (n5 * 50 * 5);
-      } else {
-        const consumption = 0.35; // 350 g/m²
-        totalKg = Math.ceil(area_m2 * consumption);
-        materialNet = totalKg * 85;
-      }
-
-      const vat = includeVAT ? materialNet * 0.23 : 0;
-      const brutto = materialNet + vat;
-
-      // Create line items based on calculated packaging
-      if (product === 'szklo') {
-        if (n20 > 0) {
+        // Add glass products to line items
+        if (finalN20 > 0) {
           lineItems.push({
             price_data: {
               currency: 'pln',
@@ -164,9 +200,9 @@ export default async function handler(
                 name: 'LamiSec Glass 20kg',
                 description: 'LamiSec - ochrona szkła/okien, 20kg',
               },
-              unit_amount: includeVAT ? 44 : 36,
+              unit_amount: Math.round(44 * 100), // 44 PLN (36 + 23% VAT) in grosze
             },
-            quantity: n20,
+            quantity: finalN20 * 20,
           });
         }
 
@@ -178,12 +214,55 @@ export default async function handler(
                 name: 'LamiSec Glass 5kg',
                 description: 'LamiSec - ochrona szkła/okien, 5kg',
               },
-              unit_amount: includeVAT ? 62 : 50,
+              unit_amount: Math.round(62 * 100), // 62 PLN (50 + 23% VAT) in grosze
             },
-            quantity: n5,
+            quantity: n5 * 5,
           });
         }
+
+        if (n1 > 0) {
+          lineItems.push({
+            price_data: {
+              currency: 'pln',
+              product_data: {
+                name: 'LamiSec Glass 1kg',
+                description: 'LamiSec - ochrona szkła/okien, 1kg',
+              },
+              unit_amount: Math.round(74 * 100), // 74 PLN (60 + 23% VAT) in grosze
+            },
+            quantity: n1,
+          });
+        }
+
+        metadata = {
+          product: 'glass',
+          area_m2,
+          n20: finalN20,
+          n5,
+          n1,
+          totalKg,
+          materialNet,
+          brutto,
+          quick: false,
+        };
+
+        computedData = {
+          kgRequired: totalKg,
+          packaging: { n20: finalN20, n5, n1 },
+          net: materialNet,
+          vat: vat,
+          brutto: brutto,
+          pricePerM2: pricePerM2,
+          product: 'glass'
+        };
       } else {
+        // Marble calculation
+        const requiredKg = Math.ceil(area_m2 * 0.35);
+        const materialNet = requiredKg * 85;
+        const vat = materialNet * 0.23;
+        const brutto = materialNet + vat;
+        const pricePerM2 = area_m2 > 0 ? materialNet / area_m2 : 0;
+
         lineItems.push({
           price_data: {
             currency: 'pln',
@@ -191,23 +270,30 @@ export default async function handler(
               name: 'LamiSec Marble Protektor',
               description: 'LamiSec - protektor (marmur)',
             },
-            unit_amount: includeVAT ? 105 : 85,
+            unit_amount: Math.round(105 * 100), // 105 PLN (85 + 23% VAT) in grosze
           },
-          quantity: totalKg,
+          quantity: requiredKg,
         });
-      }
 
-      metadata = {
-        product,
-        area_m2,
-        includeVAT,
-        n20,
-        n5,
-        n1,
-        totalKg,
-        materialNet,
-        brutto,
-      };
+        metadata = {
+          product: 'marble',
+          area_m2,
+          kg: requiredKg,
+          materialNet,
+          brutto,
+          quick: false,
+        };
+
+        computedData = {
+          kgRequired: requiredKg,
+          packaging: { n20: 0, n5: 0, n1: 0 },
+          net: materialNet,
+          vat: vat,
+          brutto: brutto,
+          pricePerM2: pricePerM2,
+          product: 'marble'
+        };
+      }
     }
 
     // Create Stripe Checkout Session
@@ -217,17 +303,38 @@ export default async function handler(
       mode: 'payment',
       success_url: `${process.env.BASE_URL}/sukces?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL}/anulowano`,
-      metadata,
+      metadata: metadata,
+      currency: 'pln',
       customer_email: req.body.email || undefined,
-      billing_address_collection: 'required',
-      shipping_address_collection: {
-        allowed_countries: ['PL', 'DE', 'CZ', 'SK', 'LT', 'LV', 'EE'],
-      },
     });
 
-    res.status(200).json({ url: session.url });
+    // Return session URL and computed data
+    res.status(200).json({ 
+      url: session.url,
+      ...computedData
+    });
   } catch (error) {
     console.error('Checkout error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+}
+
+// Helper functions for glass packaging optimization
+function evaluateOptionA(rem: number): { cost: number; n5: number; n1: number } {
+  const n5 = Math.floor(rem / 5);
+  const remaining = rem - (5 * n5);
+  const n1 = Math.ceil(remaining);
+  const cost = (n5 * 250) + (n1 * 60);
+  return { cost, n5, n1 };
+}
+
+function evaluateOptionB(rem: number): { cost: number; n5: number } {
+  const n5 = Math.ceil(rem / 5);
+  const cost = n5 * 250;
+  return { cost, n5 };
+}
+
+function evaluateOptionC(rem: number): { cost: number } {
+  const cost = 720; // 20kg bucket
+  return { cost };
 }
