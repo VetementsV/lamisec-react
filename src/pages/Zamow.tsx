@@ -61,37 +61,28 @@ const Zamow = () => {
 
   const handleCheckout = async () => {
     if (!results) return;
-
+    
     try {
-      setIsCalculating(true);
-      
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           product: material,
-          areaM2: area,
+          area_m2: area,
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Checkout failed');
-      }
-
-      const data = await response.json();
-      
-      // Redirect to Stripe Checkout
-      if (data.url) {
-        window.location.href = data.url;
+      if (response.ok) {
+        const { url } = await response.json();
+        window.location.href = url;
       } else {
-        throw new Error('No checkout URL received');
+        alert('Błąd podczas tworzenia sesji płatności. Spróbuj ponownie.');
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Błąd podczas tworzenia zamówienia. Spróbuj ponownie.');
-    } finally {
-      setIsCalculating(false);
+      alert('Błąd połączenia. Sprawdź połączenie internetowe i spróbuj ponownie.');
     }
   };
 

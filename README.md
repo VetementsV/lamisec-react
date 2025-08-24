@@ -1,207 +1,234 @@
-# LamiSec React Application
+# LamiSec React - Profesjonalne Materiały Ochronne
 
-Modern React application for LamiSec professional protective materials with Stripe Checkout integration.
+Nowoczesna aplikacja React dla firmy LamiSec, oferująca profesjonalne materiały ochronne do szkła, marmuru i kabin malarskich.
 
-## Features
+## 🚀 Funkcjonalności
 
-- **React 18 + TypeScript + Vite**: Modern development stack
-- **React Router v6**: Client-side routing
-- **Stripe Checkout**: Secure payment processing
-- **Serverless API**: Vercel functions for backend logic
-- **Polish UI**: Complete Polish language interface
-- **Responsive Design**: Mobile-first approach
+- **Strona główna** z hero section i produktami
+- **Produkty** - szczegółowe informacje o szkło i marmur
+- **Technologia** - karta technologiczna
+- **Zamów online** - kalkulator kosztów z automatycznym pakowaniem
+- **Kontakt** - informacje kontaktowe
+- **Stripe Checkout** - bezpieczne płatności online
 
-## Local Development
+## 🛠️ Technologie
 
-### Prerequisites
+- **Frontend**: React 18 + TypeScript + Vite
+- **Routing**: React Router v6
+- **Styling**: CSS3 z custom properties
+- **Płatności**: Stripe Checkout
+- **Deployment**: Vercel (serverless functions)
 
-- Node.js 18+ (recommended: Node.js 20)
-- npm or yarn
+## 📦 Instalacja
 
-### Setup
-
-1. **Clone and install dependencies:**
+1. **Klonuj repozytorium**
    ```bash
    git clone https://github.com/VetementsV/lamisec-react.git
    cd lamisec-react
+   ```
+
+2. **Zainstaluj zależności**
+   ```bash
    npm install
    ```
 
-2. **Environment variables:**
-   Create `.env.local` file:
+3. **Skonfiguruj zmienne środowiskowe**
+   ```bash
+   cp env.example .env.local
+   ```
+   
+   Edytuj `.env.local` i dodaj swoje klucze Stripe:
    ```env
-   VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
-   STRIPE_SECRET_KEY=sk_test_...
-   STRIPE_WEBHOOK_SECRET=whsec_...
+   STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
+   STRIPE_SECRET_KEY=sk_test_your_key_here
+   STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
    BASE_URL=http://localhost:5173
    ```
 
-3. **Start development server:**
+4. **Uruchom aplikację w trybie deweloperskim**
    ```bash
    npm run dev
    ```
-   Open http://localhost:5173
 
-## Vercel Deployment
+   Aplikacja będzie dostępna pod adresem: http://localhost:5173
 
-### 1. Import Repository
+## 🔧 Konfiguracja Stripe
 
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Click "New Project"
-3. Import from GitHub: `https://github.com/VetementsV/lamisec-react`
-4. Select the repository and click "Deploy"
+### 1. Klucze API
+- Zaloguj się do [Stripe Dashboard](https://dashboard.stripe.com/)
+- Przejdź do **Developers > API keys**
+- Skopiuj **Publishable key** i **Secret key**
+- Dodaj je do pliku `.env.local`
 
-### 2. Environment Variables
+### 2. Webhook
+- W Stripe Dashboard przejdź do **Developers > Webhooks**
+- Kliknij **Add endpoint**
+- URL: `https://yourdomain.com/api/webhook`
+- Events: `checkout.session.completed`
+- Skopiuj **Signing secret** i dodaj do `STRIPE_WEBHOOK_SECRET`
 
-In Vercel project settings, add these environment variables:
+## 🚀 Deployment na Vercel
 
-```env
-STRIPE_SECRET_KEY=sk_test_... # Your Stripe secret key
-STRIPE_WEBHOOK_SECRET=whsec_... # Webhook signing secret
-BASE_URL=https://your-project.vercel.app # Your Vercel URL
+### 1. Importuj repozytorium na Vercel
+- Przejdź na [vercel.com](https://vercel.com)
+- Kliknij "New Project"
+- Importuj repozytorium GitHub: `https://github.com/VetementsV/lamisec-react`
+- Vercel automatycznie wykryje konfigurację Vite
+
+### 2. Ustaw zmienne środowiskowe
+W Vercel Dashboard → Project Settings → Environment Variables dodaj:
+
+```bash
+STRIPE_SECRET_KEY=sk_test_... # Twój klucz sekretny Stripe
+STRIPE_WEBHOOK_SECRET=whsec_... # Sekret webhooka Stripe
+BASE_URL=https://<nazwa-projektu>.vercel.app # URL projektu Vercel
 ```
 
-### 3. Stripe Webhook Setup
-
-1. **In Stripe Dashboard:**
-   - Go to Developers → Webhooks
-   - Click "Add endpoint"
-   - URL: `https://your-project.vercel.app/api/webhook`
-   - Events: Select `checkout.session.completed`
-   - Click "Add endpoint"
-
-2. **Copy Webhook Secret:**
-   - Click on the created webhook
-   - Click "Reveal" next to "Signing secret"
-   - Copy the `whsec_...` value
-   - Add it to Vercel as `STRIPE_WEBHOOK_SECRET`
-
-3. **Redeploy:**
-   - Go back to Vercel
-   - Click "Redeploy" to apply environment variables
-
-## Testing
-
-### Test Card
-Use Stripe test card: `4242 4242 4242 4242`
-
-### Test Flow
-1. Go to `/zamow`
-2. Enter area (e.g., 20 m²)
-3. Select product (szkło/marmur)
-4. Click "Przejdź do płatności"
-5. Complete payment with test card
-6. Should redirect to `/sukces`
-
-### Webhook Testing
-1. In Stripe Dashboard → Webhooks
-2. Click on your webhook
-3. Click "Send test webhook"
-4. Select `checkout.session.completed`
-5. Check Vercel Runtime logs for webhook receipt
-
-## API Endpoints
-
-### `/api/checkout` (POST)
-Creates Stripe Checkout Session.
-
-**Request:**
-```json
-{
-  "product": "szklo" | "marmur",
-  "areaM2": number
-}
+**Opcjonalnie:**
+```bash
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_... # Klucz publiczny Stripe
 ```
 
-**Response:**
-```json
-{
-  "url": "https://checkout.stripe.com/...",
-  "kgRequired": 2,
-  "packaging": { "n20": 0, "n5": 0, "n1": 2 },
-  "net": 120.00,
-  "vat": 27.60,
-  "brutto": 147.60,
-  "pricePerM2": 6.00,
-  "product": "szklo"
-}
+### 3. Konfiguracja Stripe Webhook
+1. W Stripe Dashboard → Developers → Webhooks
+2. Dodaj endpoint: `https://<nazwa-projektu>.vercel.app/api/webhook`
+3. Wybierz event: `checkout.session.completed`
+4. Skopiuj "Signing secret" do `STRIPE_WEBHOOK_SECRET` na Vercel
+
+### 4. Ustawienia Build & Output
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Root Directory**: (puste)
+- **Install Command**: `npm install`
+
+### 5. Wdrożenie
+- Vercel automatycznie wdroży po push na `main`
+- Sprawdź logi build w Vercel Dashboard
+- Testuj endpointy API: `/api/checkout`, `/api/webhook`
+
+## 🔧 Zmienne środowiskowe
+
+Utwórz plik `.env.local` (nie commitowany) z następującymi zmiennymi:
+
+```bash
+# Stripe API Keys
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Base URL for redirects
+BASE_URL=http://localhost:5173
 ```
 
-### `/api/webhook` (POST)
-Handles Stripe webhooks.
+**Uwaga:** Plik `.env.example` zawiera przykładowe zmienne. Skopiuj go do `.env.local` i wypełnij rzeczywistymi wartościami.
 
-### `/api/health` (GET)
-Health check endpoint.
+## 📊 Algorytm pakowania (szkło)
 
-## Pricing Algorithm
+Aplikacja automatycznie oblicza optymalne opakowania dla minimalizacji kosztów:
 
-### Glass (Szkło)
-- **Consumption**: 0.09 kg/m² (90 g/m²)
-- **Packaging**: 20kg, 5kg, 1kg buckets
-- **Prices (NET)**:
-  - 20kg: 720 PLN (36 PLN/kg)
-  - 5kg: 250 PLN (50 PLN/kg)
-  - 1kg: 60 PLN (60 PLN/kg)
-- **Algorithm**: Minimizes total cost by choosing optimal bucket combination
+1. **Oblicz wymagane kg**: `area * 0.09` (zaokrąglone w górę)
+2. **Użyj 20kg opakowań**: `Math.floor(requiredKg / 20)`
+3. **Dla pozostałych kg**:
+   - **Opcja A**: 5kg + 1kg opakowania
+   - **Opcja B**: tylko 5kg opakowania  
+   - **Opcja C**: dodatkowe 20kg opakowanie
+4. **Wybierz najtańszą opcję**
 
-### Marble (Marmur)
-- **Consumption**: 0.35 kg/m² (350 g/m²)
-- **Price**: 85 PLN/kg (NET)
-- **Packaging**: Per kg (no bucket discounts)
+### Przykłady:
+- **60 m²**: 5.4 kg → 6 kg → 1 × 5kg + 1 × 1kg
+- **300 m²**: 27 kg → 27 kg → 1 × 20kg + 1 × 5kg + 2 × 1kg
+- **280 m²**: 25.2 kg → 26 kg → 1 × 20kg + 1 × 5kg + 1 × 1kg
 
-### VAT
-- Always applied: 23%
-- All prices shown as NET + VAT = BRUTTO
-
-## Project Structure
+## 🎨 Struktura projektu
 
 ```
-lamisec-react/
-├── src/
-│   ├── components/     # Reusable components
-│   ├── pages/         # Page components
-│   ├── lib/           # Business logic (pricing, packaging)
-│   └── App.tsx        # Main app component
-├── api/               # Vercel serverless functions
-│   ├── checkout.ts    # Stripe Checkout creation
-│   ├── webhook.ts     # Stripe webhook handler
-│   └── health.ts      # Health check
-├── public/            # Static assets
-└── vercel.json        # Vercel configuration
+src/
+├── components/          # Komponenty wielokrotnego użytku
+│   ├── Navbar.tsx      # Nawigacja główna
+│   └── Navbar.css
+├── lib/                 # Biblioteki biznesowe
+│   ├── pricing.ts      # Cennik produktów
+│   └── packaging.ts    # Algorytm pakowania
+├── pages/               # Strony aplikacji
+│   ├── Home.tsx        # Strona główna
+│   ├── Produkty.tsx    # Przegląd produktów
+│   ├── Szklo.tsx       # Szczegóły szkła
+│   ├── Marmur.tsx      # Szczegóły marmuru
+│   ├── Technologia.tsx # Karta technologiczna
+│   ├── Zamow.tsx       # Kalkulator/kalkulacja
+│   ├── Kontakt.tsx     # Informacje kontaktowe
+│   ├── Sukces.tsx      # Potwierdzenie płatności
+│   └── Anulowano.tsx   # Anulowana płatność
+└── App.tsx              # Główny komponent z routingiem
+
+api/                     # Serverless functions (Vercel)
+├── checkout.ts          # Tworzenie sesji Stripe
+└── webhook.ts           # Obsługa webhooków Stripe
 ```
 
-## Troubleshooting
+## 🔒 Bezpieczeństwo
 
-### Common Issues
+- **Walidacja po stronie serwera** wszystkich danych wejściowych
+- **Weryfikacja podpisu webhook** Stripe
+- **Cennik po stronie serwera** - brak zaufania do wartości klienta
+- **Rate limiting** (implementacja podstawowa)
+- **HTTPS tylko** w produkcji
 
-1. **500 errors on API endpoints:**
-   - Check environment variables in Vercel
-   - Verify Stripe keys are correct
-   - Check Vercel Runtime logs
+## 📱 Responsywność
 
-2. **Webhook signature verification fails:**
-   - Ensure `STRIPE_WEBHOOK_SECRET` is correct
-   - Verify webhook URL in Stripe Dashboard
-   - Check webhook endpoint is accessible
+Aplikacja jest w pełni responsywna z breakpointami:
+- **Desktop**: > 1024px
+- **Tablet**: 768px - 1024px  
+- **Mobile**: < 768px
+- **Small Mobile**: < 480px
 
-3. **Checkout session creation fails:**
-   - Verify `STRIPE_SECRET_KEY` is correct
-   - Check `BASE_URL` environment variable
-   - Ensure Stripe account is in test mode
+## 🧪 Testowanie
 
-### Vercel Logs
-- Go to Vercel Dashboard → Your Project → Functions
-- Click on function name to view logs
-- Check "Runtime Logs" for detailed error information
+### Testowanie płatności
+Użyj testowych kart Stripe:
+- **Sukces**: `4242 4242 4242 4242`
+- **Błąd**: `4000 0000 0000 0002`
+- **Wymaga 3D Secure**: `4000 0025 0000 3155`
 
-## Development Notes
+### Testowanie webhooków
+- Użyj [Stripe CLI](https://stripe.com/docs/stripe-cli) do testowania lokalnie
+- W produkcji webhook automatycznie otrzymuje zdarzenia
 
-- **ESM Only**: Project uses ES modules throughout
-- **TypeScript**: Strict type checking enabled
-- **Security**: All pricing computed server-side
-- **Validation**: Input validation on both client and server
-- **Error Handling**: Comprehensive error handling with user-friendly messages
+## 🔄 Aktualizacje
 
-## License
+### Cennik
+Edytuj `src/lib/pricing.ts`:
+```typescript
+export const PRICING: PricingData = {
+  glass: {
+    consumption: 0.09, // kg/m²
+    buckets: {
+      '1kg': 60,   // PLN/kg
+      '5kg': 50,   // PLN/kg
+      '20kg': 36,  // PLN/kg
+    },
+  },
+  // ...
+};
+```
 
-Private project for LamiSec.
+### Zużycie materiałów
+Edytuj wartości `consumption` w `src/lib/pricing.ts`
+
+## 📞 Wsparcie
+
+- **Email**: kontakt@lamisec.pl
+- **Telefon**: +48 669 484 039
+- **WhatsApp**: +48 669 484 039
+
+## 📄 Licencja
+
+© 2024 LamiSec - BENET. Wszystkie prawa zastrzeżone.
+
+---
+
+**Uwaga**: Przed wdrożeniem na produkcję upewnij się, że:
+1. Używasz **live keys** Stripe (nie test)
+2. Webhook jest skonfigurowany na produkcji
+3. `BASE_URL` wskazuje na właściwą domenę
+4. Wszystkie environment variables są ustawione

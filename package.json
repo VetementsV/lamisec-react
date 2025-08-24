@@ -14,7 +14,7 @@
     "react-router-dom": "^6.8.1",
     "@stripe/stripe-js": "^2.4.0",
     "@stripe/react-stripe-js": "^2.4.0",
-    "stripe": "^14.10.0",
+    "stripe": "^16.0.0",
     "micro": "^10.0.1"
   },
   "devDependencies": {
