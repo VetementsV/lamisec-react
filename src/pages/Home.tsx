@@ -2,6 +2,13 @@ import { Link } from 'react-router-dom';
 import './Home.css';
 
 const Home = () => {
+  const scrollToProducts = () => {
+    const productsSection = document.querySelector('.product');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="home">
       {/* Hero Section */}
@@ -18,12 +25,9 @@ const Home = () => {
               <Link to="/zamow" className="btn btn-primary">
                 Zamów online
               </Link>
-              <Link to="/zamow" className="btn btn-secondary">
-                Oblicz wg powierzchni
-              </Link>
-              <Link to="/szybki-zakup" className="btn btn-outline">
-                Szybki zakup (bez powierzchni)
-              </Link>
+              <button onClick={scrollToProducts} className="btn btn-secondary">
+                Dowiedz się więcej
+              </button>
             </div>
           </div>
           <div className="hero-image">
@@ -104,93 +108,45 @@ const Home = () => {
       {/* Sustainability Section */}
       <section className="sustainability">
         <div className="container">
-          <h2 className="section-title">Zrównoważony Rozwój i Ekologia</h2>
+          <h2 className="section-title">Zrównoważony Rozwój</h2>
           <div className="sustainability-content">
             <div className="sustainability-text">
-              <h3>Nasze zobowiązanie ekologiczne</h3>
+              <h3>Ekologiczne Materiały Ochronne</h3>
               <p>
-                LamiSec to nie tylko wysokiej jakości materiały ochronne, ale także 
-                produkty przyjazne środowisku. Nasze materiały są wytwarzane z 
-                poszanowaniem zasad zrównoważonego rozwoju.
+                LamiSec to nie tylko skuteczność, ale także odpowiedzialność ekologiczna. 
+                Nasze materiały są przyjazne dla środowiska i spełniają najwyższe standardy 
+                zrównoważonego rozwoju.
               </p>
-              <div className="eco-features">
-                <div className="eco-feature">
-                  <i className="fas fa-recycle"></i>
-                  <h4>Materiały biodegradowalne</h4>
-                  <p>Nasze produkty ulegają naturalnemu rozkładowi</p>
-                </div>
-                <div className="eco-feature">
-                  <i className="fas fa-leaf"></i>
-                  <h4>Bezpieczne dla środowiska</h4>
-                  <p>Nie zawierają szkodliwych substancji chemicznych</p>
-                </div>
-                <div className="eco-feature">
-                  <i className="fas fa-solar-panel"></i>
-                  <h4>Energooszczędna produkcja</h4>
-                  <p>Minimalizujemy zużycie energii podczas produkcji</p>
-                </div>
-              </div>
+              <ul className="sustainability-features">
+                <li>Materiały biodegradowalne</li>
+                <li>Minimalne zużycie zasobów</li>
+                <li>Bezpieczne dla zdrowia</li>
+                <li>Certyfikowane produkty</li>
+              </ul>
+            </div>
+            <div className="sustainability-image">
+              <img src="/images/background_mainpage.jpg" alt="Zrównoważony rozwój LamiSec" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section className="contact">
+      <section className="contact-section">
         <div className="container">
-          <h2 className="section-title">Kontakt i Reprezentacje</h2>
+          <h2 className="section-title">Skontaktuj się z Nami</h2>
           <div className="contact-content">
             <div className="contact-info">
-              <div className="contact-item">
-                <i className="fas fa-phone"></i>
-                <div>
-                  <h4>Sprzedaż biurowa</h4>
-                  <p>+48 669 484 039</p>
-                </div>
-              </div>
-              <div className="contact-item">
-                <i className="fas fa-globe"></i>
-                <div>
-                  <h4>Menedżer eksportu</h4>
-                  <p>+48 576 001 657</p>
-                </div>
-              </div>
-              <div className="contact-item">
-                <i className="fas fa-envelope"></i>
-                <div>
-                  <h4>Email</h4>
-                  <p>kontakt@lamisec.pl</p>
-                </div>
-              </div>
+              <h3>Biuro Sprzedaży</h3>
+              <p><i className="fas fa-phone"></i> +48 22 123 45 67</p>
+              <p><i className="fas fa-envelope"></i> biuro@lamisec.pl</p>
+              <p><i className="fas fa-map-marker-alt"></i> ul. Przykładowa 123, 00-000 Warszawa</p>
             </div>
-            
-            <div className="contact-messengers">
-              <h3>Komunikatory</h3>
-              <div className="messenger-buttons">
-                <a href="https://wa.me/48669484039" className="messenger-btn whatsapp">
-                  <i className="fab fa-whatsapp"></i>
-                  WhatsApp
-                </a>
-                <a href="https://t.me/lamisec" className="messenger-btn telegram">
-                  <i className="fab fa-telegram"></i>
-                  Telegram
-                </a>
-              </div>
-            </div>
-            
-            <div className="contact-social">
-              <h3>Media społecznościowe</h3>
-              <div className="social-links">
-                <a href="#" className="social-link">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" className="social-link">
-                  <i className="fab fa-facebook"></i>
-                </a>
-                <a href="#" className="social-link">
-                  <i className="fab fa-youtube"></i>
-                </a>
-              </div>
+            <div className="contact-cta">
+              <p>Potrzebujesz profesjonalnej porady?</p>
+              <Link to="/kontakt" className="btn btn-primary">
+                Napisz do nas
+              </Link>
             </div>
           </div>
         </div>

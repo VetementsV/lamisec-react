@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -22,67 +32,43 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <div className="nav-container">
-        <div className="nav-logo">
-          <Link to="/" onClick={closeMenu}>
-            <img src="/images/Lamisec_white_logo.png" alt="LamiSec Logo" className="logo-img" />
-          </Link>
-        </div>
+    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+      <div className="navbar-container">
+        <Link to="/" className="navbar-logo" onClick={closeMenu}>
+          <img src="/images/Lamisec_white_logo.png" alt="LamiSec" />
+        </Link>
         
-        <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
-          <li className="nav-item">
-            <Link 
-              to="/" 
-              className={`nav-link ${isActive('/') ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
+        <button className="navbar-toggle" onClick={toggleMenu}>
+          <i className={`fas fa-${isOpen ? 'times' : 'bars'}`}></i>
+        </button>
+        
+        <ul className={`navbar-nav ${isOpen ? 'open' : ''}`}>
+          <li>
+            <Link to="/" onClick={closeMenu} className={isActive('/') ? 'active' : ''}>
               Strona główna
             </Link>
           </li>
-          <li className="nav-item">
-            <Link 
-              to="/produkty" 
-              className={`nav-link ${isActive('/produkty') ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
+          <li>
+            <Link to="/produkty" onClick={closeMenu} className={isActive('/produkty') ? 'active' : ''}>
               Produkty
             </Link>
           </li>
-          <li className="nav-item">
-            <Link 
-              to="/technologia" 
-              className={`nav-link ${isActive('/technologia') ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
+          <li>
+            <Link to="/technologia" onClick={closeMenu} className={isActive('/technologia') ? 'active' : ''}>
               Technologia
             </Link>
           </li>
-          <li className="nav-item">
-            <Link 
-              to="/zamow" 
-              className={`nav-link ${isActive('/zamow') ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
+          <li>
+            <Link to="/zamow" onClick={closeMenu} className={isActive('/zamow') ? 'active' : ''}>
               Zamów
             </Link>
           </li>
-          <li className="nav-item">
-            <Link 
-              to="/kontakt" 
-              className={`nav-link ${isActive('/kontakt') ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
+          <li>
+            <Link to="/kontakt" onClick={closeMenu} className={isActive('/kontakt') ? 'active' : ''}>
               Kontakt
             </Link>
           </li>
         </ul>
-        
-        <div className="hamburger" onClick={toggleMenu}>
-          <span className={`bar ${isOpen ? 'active' : ''}`}></span>
-          <span className={`bar ${isOpen ? 'active' : ''}`}></span>
-          <span className={`bar ${isOpen ? 'active' : ''}`}></span>
-        </div>
       </div>
     </nav>
   );
