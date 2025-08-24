@@ -38,7 +38,6 @@ const Navbar = () => {
           <img 
             src="/images/Lamisec_white_logo.png" 
             alt="LamiSec" 
-            style={{ height: '28px', width: 'auto', maxHeight: '28px' }}
           />
         </Link>
         

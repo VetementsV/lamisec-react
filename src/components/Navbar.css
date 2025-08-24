@@ -24,42 +24,26 @@
 }
 
 .navbar-logo {
+  display: flex;
+  align-items: center;
   height: 40px;
   width: auto;
   max-height: 40px;
-  border: 2px solid red; /* Debug border */
 }
 
 .navbar-logo img {
-  height: 40px !important;
-  width: auto !important;
-  max-height: 40px !important;
+  height: 40px;
+  width: auto;
+  max-height: 40px;
   display: block;
-  border: 2px solid blue; /* Debug border */
-}
-
-.navbar .navbar-logo {
-  height: 28px !important;
-  width: auto !important;
-  max-height: 28px !important;
-  border: 2px solid red; /* Debug border */
-}
-
-.navbar .navbar-logo img {
-  height: 28px !important;
-  width: auto !important;
-  max-height: 28px !important;
-  display: block !important;
-  border: 2px solid blue; /* Debug border */
 }
 
 /* Even more specific override */
 .navbar .navbar-container .navbar-logo img {
-  height: 28px !important;
-  width: auto !important;
-  max-height: 28px !important;
-  display: block !important;
-  border: 2px solid green; /* Different debug border */
+  height: 40px;
+  width: auto;
+  max-height: 40px;
+  display: block;
 }
 
 .navbar-nav {
@@ -109,6 +93,11 @@
 @media (max-width: 768px) {
   .navbar-toggle {
     display: block;
+  }
+  
+  .navbar-logo img {
+    height: 32px;
+    max-height: 32px;
   }
   
   .navbar-nav {
