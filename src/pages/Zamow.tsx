@@ -69,15 +69,17 @@ const Zamow = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          product: material,
-          area_m2: area,
+          product: material === 'glass' ? 'szklo' : 'marmur',
+          areaM2: area,
         }),
       });
 
-      if (response.ok) {
-        const { url } = await response.json();
-        window.location.href = url;
+      const data = await response.json();
+      
+      if (response.ok && data.url) {
+        window.location.href = data.url;
       } else {
+        console.error('Checkout error:', data.error);
         alert('Błąd podczas tworzenia sesji płatności. Spróbuj ponownie.');
       }
     } catch (error) {

@@ -34,7 +34,7 @@ Nowoczesna aplikacja React dla firmy LamiSec, oferująca profesjonalne materiał
 
 3. **Skonfiguruj zmienne środowiskowe**
    ```bash
-   cp env.example .env.local
+   cp .env.example .env.local
    ```
    
    Edytuj `.env.local` i dodaj swoje klucze Stripe:
@@ -163,7 +163,8 @@ src/
 
 api/                     # Serverless functions (Vercel)
 ├── checkout.ts          # Tworzenie sesji Stripe
-└── webhook.ts           # Obsługa webhooków Stripe
+├── webhook.ts           # Obsługa webhooków Stripe
+└── health.ts            # Health check endpoint
 ```
 
 ## 🔒 Bezpieczeństwo
@@ -194,6 +195,11 @@ Użyj testowych kart Stripe:
 - Użyj [Stripe CLI](https://stripe.com/docs/stripe-cli) do testowania lokalnie
 - W produkcji webhook automatycznie otrzymuje zdarzenia
 
+### Endpointy API
+- **Health check**: `GET /api/health` → `{ ok: true }`
+- **Checkout**: `POST /api/checkout` → `{ url: "..." }`
+- **Webhook**: `POST /api/webhook` → `{ received: true }`
+
 ## 🔄 Aktualizacje
 
 ### Cennik
@@ -214,6 +220,28 @@ export const PRICING: PricingData = {
 
 ### Zużycie materiałów
 Edytuj wartości `consumption` w `src/lib/pricing.ts`
+
+## 🚨 Troubleshooting
+
+### Błędy 400/500
+- **400 Bad Request**: Sprawdź czy wysyłasz poprawny JSON z `product` i `areaM2`
+- **500 Internal Server Error**: Sprawdź czy wszystkie zmienne środowiskowe są ustawione
+- **Webhook signature verification failed**: Sprawdź czy `STRIPE_WEBHOOK_SECRET` jest poprawny
+
+### Logi
+- **Vercel Runtime Logs**: Vercel Dashboard → Project → Functions → Logs
+- **Stripe Dashboard**: Developers → Logs
+- **Lokalne testy**: `stripe listen --forward-to localhost:3000/api/webhook`
+
+### Testowanie lokalne
+```bash
+# Stripe CLI
+stripe login
+stripe listen --forward-to localhost:5173/api/webhook
+
+# Test webhook
+stripe trigger checkout.session.completed
+```
 
 ## 📞 Wsparcie
 
