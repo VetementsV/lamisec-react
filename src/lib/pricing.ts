@@ -18,8 +18,8 @@ export const PRICING: PricingData = {
     consumption: 0.09, // kg/m²
     buckets: {
       '1kg': 60,   // PLN/kg
-      '5kg': 50,   // PLN/kg
-      '20kg': 36,  // PLN/kg
+      '5kg': 50,   // PLN/kg (bucket 5kg = 250 PLN)
+      '20kg': 36,  // PLN/kg (bucket 20kg = 720 PLN)
     },
   },
   marble: {
@@ -30,19 +30,17 @@ export const PRICING: PricingData = {
 
 export const VAT_RATE = 0.23;
 
-export function calculateNetPrice(kg: number, product: 'glass' | 'marble'): number {
-  if (product === 'glass') {
-    // This would need the packaging algorithm
-    return 0;
-  } else {
-    return kg * PRICING.marble.pricePerKg;
-  }
-}
+// Helper function to format currency
+export const formatCurrency = (amount: number): string => {
+  return `${amount.toFixed(2)} PLN`;
+};
 
-export function calculateVAT(netPrice: number): number {
-  return netPrice * VAT_RATE;
-}
+// Helper function to calculate VAT
+export const calculateVAT = (netAmount: number): number => {
+  return netAmount * VAT_RATE;
+};
 
-export function calculateBrutto(netPrice: number): number {
-  return netPrice + calculateVAT(netPrice);
-}
+// Helper function to calculate brutto
+export const calculateBrutto = (netAmount: number): number => {
+  return netAmount + calculateVAT(netAmount);
+};

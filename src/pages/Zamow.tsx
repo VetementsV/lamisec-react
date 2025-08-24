@@ -55,6 +55,11 @@ const Zamow = () => {
         setIsFormValid(false);
         return false;
       }
+      if (!Number.isInteger(debouncedKg)) {
+        setValidationError('Ilość w kg musi być liczbą całkowitą');
+        setIsFormValid(false);
+        return false;
+      }
       if (debouncedKg > 10000) {
         setValidationError('Ilość nie może przekraczać 10 000 kg');
         setIsFormValid(false);

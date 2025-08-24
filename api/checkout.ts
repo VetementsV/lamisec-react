@@ -132,16 +132,34 @@ export default async function handler(req: any, res: any) {
 
   try {
     // Parse and validate request body
-    const { product, areaM2 } = req.body;
+    const { product, areaM2, kg, unit } = req.body;
 
     // Validate product
     if (!product || !['szklo', 'marmur'].includes(product)) {
       return res.status(400).json({ error: 'Invalid product type. Must be "szklo" or "marmur"' });
     }
 
-    // Validate area
-    if (!areaM2 || areaM2 <= 0 || areaM2 > 10000) {
+    // Validate unit
+    if (!unit || !['m2', 'kg'].includes(unit)) {
+      return res.status(400).json({ error: 'Invalid unit. Must be "m2" or "kg"' });
+    }
+
+    // XOR validation: exactly one of areaM2 or kg must be provided
+    if (unit === 'm2' && (!areaM2 || areaM2 <= 0 || areaM2 > 10000)) {
       return res.status(400).json({ error: 'Invalid area. Must be between 0.1 and 10000 m²' });
+    }
+    
+    if (unit === 'kg' && (!kg || kg <= 0 || kg > 10000 || !Number.isInteger(kg))) {
+      return res.status(400).json({ error: 'Invalid kg amount. Must be an integer between 1 and 10000 kg' });
+    }
+
+    // Ensure only one value is provided
+    if (unit === 'm2' && kg !== undefined) {
+      return res.status(400).json({ error: 'Cannot provide both areaM2 and kg' });
+    }
+    
+    if (unit === 'kg' && areaM2 !== undefined) {
+      return res.status(400).json({ error: 'Cannot provide both areaM2 and kg' });
     }
 
     let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -149,88 +167,171 @@ export default async function handler(req: any, res: any) {
     let computedData: any = {};
 
     if (product === 'szklo') {
-      // Glass calculation
-      const requiredKg = areaM2 * PRICING.glass.consumption;
-      const packaging = computeGlassPackaging(requiredKg);
-      const pricePerM2 = areaM2 > 0 ? packaging.materialNet / areaM2 : 0;
+      if (unit === 'm2') {
+        // Glass calculation by area
+        const requiredKg = areaM2 * PRICING.glass.consumption;
+        const packaging = computeGlassPackaging(requiredKg);
+        const pricePerM2 = areaM2 > 0 ? packaging.materialNet / areaM2 : 0;
 
-      // Create single line item for the total amount
-      lineItems.push({
-        price_data: {
-          currency: 'pln',
-          product_data: {
-            name: 'LamiSec Glass Protection',
-            description: `LamiSec - ochrona szkła/okien, ${areaM2} m²`,
+        lineItems.push({
+          price_data: {
+            currency: 'pln',
+            product_data: {
+              name: 'LamiSec Glass Protection',
+              description: `LamiSec - ochrona szkła/okien, ${areaM2} m²`,
+            },
+            unit_amount: Math.round(packaging.brutto * 100), // Convert to grosze
           },
-          unit_amount: Math.round(packaging.brutto * 100), // Convert to grosze
-        },
-        quantity: 1,
-      });
+          quantity: 1,
+        });
 
-      metadata = {
-        product: 'szklo',
-        areaM2: areaM2.toString(),
-        totalKg: packaging.totalKg.toString(),
-        n20: packaging.n20.toString(),
-        n5: packaging.n5.toString(),
-        n1: packaging.n1.toString(),
-        net: packaging.materialNet.toString(),
-        vat: packaging.vat.toString(),
-        brutto: packaging.brutto.toString(),
-        pricePerM2: pricePerM2.toString(),
-      };
+        metadata = {
+          product: 'szklo',
+          unit: 'm2',
+          areaM2: areaM2.toString(),
+          totalKg: packaging.totalKg.toString(),
+          n20: packaging.n20.toString(),
+          n5: packaging.n5.toString(),
+          n1: packaging.n1.toString(),
+          net: packaging.materialNet.toString(),
+          vat: packaging.vat.toString(),
+          brutto: packaging.brutto.toString(),
+          pricePerM2: pricePerM2.toString(),
+        };
 
-      computedData = {
-        kgRequired: packaging.totalKg,
-        packaging: { n20: packaging.n20, n5: packaging.n5, n1: packaging.n1 },
-        net: packaging.materialNet,
-        vat: packaging.vat,
-        brutto: packaging.brutto,
-        pricePerM2: pricePerM2,
-        product: 'szklo'
-      };
+        computedData = {
+          kgRequired: packaging.totalKg,
+          packaging: { n20: packaging.n20, n5: packaging.n5, n1: packaging.n1 },
+          net: packaging.materialNet,
+          vat: packaging.vat,
+          brutto: packaging.brutto,
+          pricePerM2: pricePerM2,
+          product: 'szklo'
+        };
+      } else {
+        // Glass calculation by kg
+        const normalizedKg = Math.ceil(kg);
+        const packaging = computeGlassPackaging(normalizedKg);
+
+        lineItems.push({
+          price_data: {
+            currency: 'pln',
+            product_data: {
+              name: 'LamiSec Glass Protection',
+              description: `LamiSec - ochrona szkła/okien, ${normalizedKg} kg`,
+            },
+            unit_amount: Math.round(packaging.brutto * 100), // Convert to grosze
+          },
+          quantity: 1,
+        });
+
+        metadata = {
+          product: 'szklo',
+          unit: 'kg',
+          kg: normalizedKg.toString(),
+          totalKg: packaging.totalKg.toString(),
+          n20: packaging.n20.toString(),
+          n5: packaging.n5.toString(),
+          n1: packaging.n1.toString(),
+          net: packaging.materialNet.toString(),
+          vat: packaging.vat.toString(),
+          brutto: packaging.brutto.toString(),
+        };
+
+        computedData = {
+          kgRequired: packaging.totalKg,
+          packaging: { n20: packaging.n20, n5: packaging.n5, n1: packaging.n1 },
+          net: packaging.materialNet,
+          vat: packaging.vat,
+          brutto: packaging.brutto,
+          product: 'szklo'
+        };
+      }
     } else {
-      // Marble calculation
-      const requiredKg = Math.ceil(areaM2 * PRICING.marble.consumption);
-      const materialNet = requiredKg * PRICING.marble.pricePerKg;
-      const vat = materialNet * VAT_RATE;
-      const brutto = materialNet + vat;
-      const pricePerM2 = areaM2 > 0 ? materialNet / areaM2 : 0;
+      if (unit === 'm2') {
+        // Marble calculation by area
+        const requiredKg = Math.ceil(areaM2 * PRICING.marble.consumption);
+        const materialNet = requiredKg * PRICING.marble.pricePerKg;
+        const vat = materialNet * VAT_RATE;
+        const brutto = materialNet + vat;
+        const pricePerM2 = areaM2 > 0 ? materialNet / areaM2 : 0;
 
-      lineItems.push({
-        price_data: {
-          currency: 'pln',
-          product_data: {
-            name: 'LamiSec Marble Protektor',
-            description: `LamiSec - protektor (marmur), ${areaM2} m²`,
+        lineItems.push({
+          price_data: {
+            currency: 'pln',
+            product_data: {
+              name: 'LamiSec Marble Protektor',
+              description: `LamiSec - protektor (marmur), ${areaM2} m²`,
+            },
+            unit_amount: Math.round(brutto * 100), // Convert to grosze
           },
-          unit_amount: Math.round(brutto * 100), // Convert to grosze
-        },
-        quantity: 1,
-      });
+          quantity: 1,
+        });
 
-      metadata = {
-        product: 'marmur',
-        areaM2: areaM2.toString(),
-        totalKg: requiredKg.toString(),
-        n20: '0',
-        n5: '0',
-        n1: '0',
-        net: materialNet.toString(),
-        vat: vat.toString(),
-        brutto: brutto.toString(),
-        pricePerM2: pricePerM2.toString(),
-      };
+        metadata = {
+          product: 'marmur',
+          unit: 'm2',
+          areaM2: areaM2.toString(),
+          totalKg: requiredKg.toString(),
+          n20: '0',
+          n5: '0',
+          n1: '0',
+          net: materialNet.toString(),
+          vat: vat.toString(),
+          brutto: brutto.toString(),
+          pricePerM2: pricePerM2.toString(),
+        };
 
-      computedData = {
-        kgRequired: requiredKg,
-        packaging: { n20: 0, n5: 0, n1: 0 },
-        net: materialNet,
-        vat: vat,
-        brutto: brutto,
-        pricePerM2: pricePerM2,
-        product: 'marmur'
-      };
+        computedData = {
+          kgRequired: requiredKg,
+          packaging: { n20: 0, n5: 0, n1: 0 },
+          net: materialNet,
+          vat: vat,
+          brutto: brutto,
+          pricePerM2: pricePerM2,
+          product: 'marmur'
+        };
+      } else {
+        // Marble calculation by kg
+        const normalizedKg = Math.ceil(kg);
+        const materialNet = normalizedKg * PRICING.marble.pricePerKg;
+        const vat = materialNet * VAT_RATE;
+        const brutto = materialNet + vat;
+
+        lineItems.push({
+          price_data: {
+            currency: 'pln',
+            product_data: {
+              name: 'LamiSec Marble Protektor',
+              description: `LamiSec - protektor (marmur), ${normalizedKg} kg`,
+            },
+            unit_amount: Math.round(brutto * 100), // Convert to grosze
+          },
+          quantity: 1,
+        });
+
+        metadata = {
+          product: 'marmur',
+          unit: 'kg',
+          kg: normalizedKg.toString(),
+          totalKg: normalizedKg.toString(),
+          n20: '0',
+          n5: '0',
+          n1: '0',
+          net: materialNet.toString(),
+          vat: vat.toString(),
+          brutto: brutto.toString(),
+        };
+
+        computedData = {
+          kgRequired: normalizedKg,
+          packaging: { n20: 0, n5: 0, n1: 0 },
+          net: materialNet,
+          vat: vat,
+          brutto: brutto,
+          product: 'marmur'
+        };
+      }
     }
 
     // Create Stripe Checkout Session
