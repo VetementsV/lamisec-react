@@ -55,10 +55,8 @@ export function computePackaging(requiredKg: number, area: number, includeVAT: b
   const finalN20 = n20 + (n5 === 0 && n1 === 0 && rem > 0 ? 1 : 0);
   const totalKg = (finalN20 * 20) + (n5 * 5) + n1;
   
-  // Calculate costs
-  const materialNet = (finalN20 * PRICING.glass.buckets['20kg'] * 20) + 
-                     (n5 * PRICING.glass.buckets['5kg'] * 5) + 
-                     (n1 * PRICING.glass.buckets['1kg']);
+  // Calculate costs using bucket prices (not per-kg prices)
+  const materialNet = (finalN20 * 720) + (n5 * 250) + (n1 * 60);
   
   const vat = includeVAT ? materialNet * 0.23 : 0;
   const brutto = materialNet + vat;
@@ -80,18 +78,18 @@ function evaluateOptionA(rem: number): { cost: number; n5: number; n1: number } 
   const n5 = Math.floor(rem / 5);
   const remaining = rem - (5 * n5);
   const n1 = Math.ceil(remaining);
-  const cost = (n5 * PRICING.glass.buckets['5kg'] * 5) + (n1 * PRICING.glass.buckets['1kg']);
+  const cost = (n5 * 250) + (n1 * 60);
   return { cost, n5, n1 };
 }
 
 function evaluateOptionB(rem: number): { cost: number; n5: number } {
   const n5 = Math.ceil(rem / 5);
-  const cost = n5 * PRICING.glass.buckets['5kg'] * 5;
+  const cost = n5 * 250;
   return { cost, n5 };
 }
 
 function evaluateOptionC(rem: number): { cost: number } {
-  const cost = PRICING.glass.buckets['20kg'] * 20; // 720 PLN
+  const cost = 720; // 20kg bucket
   return { cost };
 }
 
