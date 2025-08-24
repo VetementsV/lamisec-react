@@ -18,13 +18,38 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const buf = await buffer(req);
+  // Validate required environment variables
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error("Missing STRIPE_SECRET_KEY");
+    return res.status(500).json({ error: "Server configuration error" });
+  }
+
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error("Missing STRIPE_WEBHOOK_SECRET");
+    return res.status(500).json({ error: "Server configuration error" });
+  }
+
   const sig = req.headers["stripe-signature"] as string;
+  if (!sig) {
+    console.error("Missing stripe-signature header");
+    return res.status(400).json({ error: "Missing stripe-signature header" });
+  }
+
+  let raw: string;
+  try {
+    // Try to get raw body using micro buffer, with fallback
+    raw = (typeof (req as any).text === "function") 
+      ? await (req as any).text() 
+      : (await buffer(req)).toString();
+  } catch (error) {
+    console.error("Failed to read request body:", error);
+    return res.status(400).json({ error: "Failed to read request body" });
+  }
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(raw, sig, webhookSecret);
   } catch (err) {
     console.error("Webhook signature verification failed:", err);
     return res.status(400).json({ error: "Webhook signature verification failed" });
@@ -44,22 +69,18 @@ export default async function handler(req: any, res: any) {
           metadata: session.metadata,
         });
 
-        // Here you would typically:
-        // 1. Save order to database
-        // 2. Send confirmation email
-        // 3. Update inventory
-        // 4. Notify fulfillment team
-        
-        // For now, we'll just log the order details
+        // Log detailed order information
         if (session.metadata) {
-          const { product, area_m2, totalKg, materialNet, brutto } = session.metadata;
+          const { product, areaM2, kgRequired, net, vat, brutto, pricePerM2 } = session.metadata;
           
           console.log("Order details:", {
             product,
-            area_m2: area_m2 ? `${area_m2} m²` : "N/A",
-            totalKg: totalKg ? `${totalKg} kg` : "N/A",
-            materialNet: materialNet ? `${materialNet} PLN` : "N/A",
+            areaM2: areaM2 ? `${areaM2} m²` : "N/A",
+            kgRequired: kgRequired ? `${kgRequired} kg` : "N/A",
+            net: net ? `${net} PLN` : "N/A",
+            vat: vat ? `${vat} PLN` : "N/A",
             brutto: brutto ? `${brutto} PLN` : "N/A",
+            pricePerM2: pricePerM2 ? `${pricePerM2} PLN/m²` : "N/A",
           });
         }
         break;
