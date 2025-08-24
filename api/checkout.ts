@@ -1,20 +1,20 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: "2023-10-16",
 });
 
 export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
     const { product, area_m2, quick, n1, n5, n20, kg } = req.body;
 
     // Input validation
-    if (!product || (product !== 'szklo' && product !== 'marble')) {
-      return res.status(400).json({ error: 'Invalid product type' });
+    if (!product || (product !== "szklo" && product !== "marble")) {
+      return res.status(400).json({ error: "Invalid product type" });
     }
 
     let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -23,12 +23,12 @@ export default async function handler(req: any, res: any) {
 
     if (quick) {
       // Quick buy flow
-      if (quick === 'glass') {
+      if (quick === "glass") {
         const quantities = { n1: n1 || 0, n5: n5 || 0, n20: n20 || 0 };
         const totalKg = quantities.n1 + (quantities.n5 * 5) + (quantities.n20 * 20);
         
         if (totalKg === 0) {
-          return res.status(400).json({ error: 'No products selected' });
+          return res.status(400).json({ error: "No products selected" });
         }
 
         // Calculate NET prices (VAT will be added by Stripe)
@@ -40,10 +40,10 @@ export default async function handler(req: any, res: any) {
         if (quantities.n1 > 0) {
           lineItems.push({
             price_data: {
-              currency: 'pln',
+              currency: "pln",
               product_data: {
-                name: 'LamiSec Glass 1kg',
-                description: 'LamiSec - ochrona szkła/okien, 1kg',
+                name: "LamiSec Glass 1kg",
+                description: "LamiSec - ochrona szkła/okien, 1kg",
               },
               unit_amount: Math.round(74 * 100), // 74 PLN (60 + 23% VAT) in grosze
             },
@@ -54,10 +54,10 @@ export default async function handler(req: any, res: any) {
         if (quantities.n5 > 0) {
           lineItems.push({
             price_data: {
-              currency: 'pln',
+              currency: "pln",
               product_data: {
-                name: 'LamiSec Glass 5kg',
-                description: 'LamiSec - ochrona szkła/okien, 5kg',
+                name: "LamiSec Glass 5kg",
+                description: "LamiSec - ochrona szkła/okien, 5kg",
               },
               unit_amount: Math.round(62 * 100), // 62 PLN (50 + 23% VAT) in grosze
             },
@@ -68,10 +68,10 @@ export default async function handler(req: any, res: any) {
         if (quantities.n20 > 0) {
           lineItems.push({
             price_data: {
-              currency: 'pln',
+              currency: "pln",
               product_data: {
-                name: 'LamiSec Glass 20kg',
-                description: 'LamiSec - ochrona szkła/okien, 20kg',
+                name: "LamiSec Glass 20kg",
+                description: "LamiSec - ochrona szkła/okien, 20kg",
               },
               unit_amount: Math.round(44 * 100), // 44 PLN (36 + 23% VAT) in grosze
             },
@@ -80,7 +80,7 @@ export default async function handler(req: any, res: any) {
         }
 
         metadata = {
-          product: 'glass',
+          product: "glass",
           n1: quantities.n1,
           n5: quantities.n5,
           n20: quantities.n20,
@@ -95,11 +95,11 @@ export default async function handler(req: any, res: any) {
           vat: vat,
           brutto: brutto,
           pricePerM2: 0, // Not applicable for quick buy
-          product: 'glass'
+          product: "glass"
         };
-      } else if (quick === 'marble') {
+      } else if (quick === "marble") {
         if (!kg || kg <= 0) {
-          return res.status(400).json({ error: 'Invalid marble quantity' });
+          return res.status(400).json({ error: "Invalid marble quantity" });
         }
 
         const materialNet = kg * 85;
@@ -108,10 +108,10 @@ export default async function handler(req: any, res: any) {
 
         lineItems.push({
           price_data: {
-            currency: 'pln',
+            currency: "pln",
             product_data: {
-              name: 'LamiSec Marble Protektor',
-              description: 'LamiSec - protektor (marmur)',
+              name: "LamiSec Marble Protektor",
+              description: "LamiSec - protektor (marmur)",
             },
             unit_amount: Math.round(105 * 100), // 105 PLN (85 + 23% VAT) in grosze
           },
@@ -119,7 +119,7 @@ export default async function handler(req: any, res: any) {
         });
 
         metadata = {
-          product: 'marble',
+          product: "marble",
           kg,
           quick: true,
         };
@@ -131,16 +131,16 @@ export default async function handler(req: any, res: any) {
           vat: vat,
           brutto: brutto,
           pricePerM2: materialNet / kg,
-          product: 'marble'
+          product: "marble"
         };
       }
     } else {
       // Area-based calculation
       if (!area_m2 || area_m2 < 0.1 || area_m2 > 50000) {
-        return res.status(400).json({ error: 'Invalid area' });
+        return res.status(400).json({ error: "Invalid area" });
       }
 
-      if (product === 'szklo') {
+      if (product === "szklo") {
         // Glass packaging calculation
         const requiredKg = area_m2 * 0.09; // 90 g/m²
         const req = Math.ceil(requiredKg);
@@ -195,10 +195,10 @@ export default async function handler(req: any, res: any) {
         if (finalN20 > 0) {
           lineItems.push({
             price_data: {
-              currency: 'pln',
+              currency: "pln",
               product_data: {
-                name: 'LamiSec Glass 20kg',
-                description: 'LamiSec - ochrona szkła/okien, 20kg',
+                name: "LamiSec Glass 20kg",
+                description: "LamiSec - ochrona szkła/okien, 20kg",
               },
               unit_amount: Math.round(44 * 100), // 44 PLN (36 + 23% VAT) in grosze
             },
@@ -209,10 +209,10 @@ export default async function handler(req: any, res: any) {
         if (n5 > 0) {
           lineItems.push({
             price_data: {
-              currency: 'pln',
+              currency: "pln",
               product_data: {
-                name: 'LamiSec Glass 5kg',
-                description: 'LamiSec - ochrona szkła/okien, 5kg',
+                name: "LamiSec Glass 5kg",
+                description: "LamiSec - ochrona szkła/okien, 5kg",
               },
               unit_amount: Math.round(62 * 100), // 62 PLN (50 + 23% VAT) in grosze
             },
@@ -223,10 +223,10 @@ export default async function handler(req: any, res: any) {
         if (n1 > 0) {
           lineItems.push({
             price_data: {
-              currency: 'pln',
+              currency: "pln",
               product_data: {
-                name: 'LamiSec Glass 1kg',
-                description: 'LamiSec - ochrona szkła/okien, 1kg',
+                name: "LamiSec Glass 1kg",
+                description: "LamiSec - ochrona szkła/okien, 1kg",
               },
               unit_amount: Math.round(74 * 100), // 74 PLN (60 + 23% VAT) in grosze
             },
@@ -235,7 +235,7 @@ export default async function handler(req: any, res: any) {
         }
 
         metadata = {
-          product: 'glass',
+          product: "glass",
           area_m2,
           n20: finalN20,
           n5,
@@ -253,7 +253,7 @@ export default async function handler(req: any, res: any) {
           vat: vat,
           brutto: brutto,
           pricePerM2: pricePerM2,
-          product: 'glass'
+          product: "glass"
         };
       } else {
         // Marble calculation
@@ -265,10 +265,10 @@ export default async function handler(req: any, res: any) {
 
         lineItems.push({
           price_data: {
-            currency: 'pln',
+            currency: "pln",
             product_data: {
-              name: 'LamiSec Marble Protektor',
-              description: 'LamiSec - protektor (marmur)',
+              name: "LamiSec Marble Protektor",
+              description: "LamiSec - protektor (marmur)",
             },
             unit_amount: Math.round(105 * 100), // 105 PLN (85 + 23% VAT) in grosze
           },
@@ -276,7 +276,7 @@ export default async function handler(req: any, res: any) {
         });
 
         metadata = {
-          product: 'marble',
+          product: "marble",
           area_m2,
           kg: requiredKg,
           materialNet,
@@ -291,20 +291,20 @@ export default async function handler(req: any, res: any) {
           vat: vat,
           brutto: brutto,
           pricePerM2: pricePerM2,
-          product: 'marble'
+          product: "marble"
         };
       }
     }
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ["card"],
       line_items: lineItems,
-      mode: 'payment',
+      mode: "payment",
       success_url: `${process.env.BASE_URL}/sukces?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL}/anulowano`,
       metadata: metadata,
-      currency: 'pln',
+      currency: "pln",
       customer_email: req.body.email || undefined,
     });
 
@@ -314,8 +314,8 @@ export default async function handler(req: any, res: any) {
       ...computedData
     });
   } catch (error) {
-    console.error('Checkout error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Checkout error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 
