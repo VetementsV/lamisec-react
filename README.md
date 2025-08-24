@@ -69,27 +69,58 @@ Nowoczesna aplikacja React dla firmy LamiSec, oferująca profesjonalne materiał
 
 ## 🚀 Deployment na Vercel
 
-### 1. Import repozytorium
-- Zaloguj się do [Vercel](https://vercel.com/)
-- Kliknij **New Project**
-- Wybierz repozytorium `lamisec-react`
-- Kliknij **Import**
+### 1. Importuj repozytorium na Vercel
+- Przejdź na [vercel.com](https://vercel.com)
+- Kliknij "New Project"
+- Importuj repozytorium GitHub: `https://github.com/VetementsV/lamisec-react`
+- Vercel automatycznie wykryje konfigurację Vite
 
-### 2. Konfiguracja środowiska
-W sekcji **Environment Variables** dodaj:
-```
-STRIPE_PUBLISHABLE_KEY=pk_live_your_key
-STRIPE_SECRET_KEY=sk_live_your_key
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
-BASE_URL=https://yourdomain.com
+### 2. Ustaw zmienne środowiskowe
+W Vercel Dashboard → Project Settings → Environment Variables dodaj:
+
+```bash
+STRIPE_SECRET_KEY=sk_test_... # Twój klucz sekretny Stripe
+STRIPE_WEBHOOK_SECRET=whsec_... # Sekret webhooka Stripe
+BASE_URL=https://<nazwa-projektu>.vercel.app # URL projektu Vercel
 ```
 
-### 3. Deploy
-- Kliknij **Deploy**
-- Po udanym deploy, skopiuj URL
-- Zaktualizuj `BASE_URL` w Stripe webhook
-- Zaktualizuj `BASE_URL` w Vercel environment variables
-- Redeploy
+**Opcjonalnie:**
+```bash
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_... # Klucz publiczny Stripe
+```
+
+### 3. Konfiguracja Stripe Webhook
+1. W Stripe Dashboard → Developers → Webhooks
+2. Dodaj endpoint: `https://<nazwa-projektu>.vercel.app/api/webhook`
+3. Wybierz event: `checkout.session.completed`
+4. Skopiuj "Signing secret" do `STRIPE_WEBHOOK_SECRET` na Vercel
+
+### 4. Ustawienia Build & Output
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Root Directory**: (puste)
+- **Install Command**: `npm install`
+
+### 5. Wdrożenie
+- Vercel automatycznie wdroży po push na `main`
+- Sprawdź logi build w Vercel Dashboard
+- Testuj endpointy API: `/api/checkout`, `/api/webhook`
+
+## 🔧 Zmienne środowiskowe
+
+Utwórz plik `.env.local` (nie commitowany) z następującymi zmiennymi:
+
+```bash
+# Stripe API Keys
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Base URL for redirects
+BASE_URL=http://localhost:5173
+```
+
+**Uwaga:** Plik `.env.example` zawiera przykładowe zmienne. Skopiuj go do `.env.local` i wypełnij rzeczywistymi wartościami.
 
 ## 📊 Algorytm pakowania (szkło)
 
