@@ -154,29 +154,40 @@ const Zamow = () => {
     if (!results || !isFormValid) return;
     
     try {
+      // Build payload based on unit
+      const payload: any = {
+        product: material === 'glass' ? 'szklo' : 'marmur',
+        unit: unit,
+      };
+
+      // Only add the relevant value based on unit
+      if (unit === 'm2') {
+        payload.areaM2 = debouncedArea;
+      } else {
+        payload.kg = debouncedKg;
+      }
+
+      console.log('[frontend] 🚀 Sending checkout payload:', payload);
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          product: material === 'glass' ? 'szklo' : 'marmur',
-          areaM2: unit === 'm2' ? debouncedArea : 0,
-          kg: unit === 'kg' ? debouncedKg : 0,
-          unit: unit,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
       
       if (response.ok && data.url) {
+        console.log('[frontend] ✅ Checkout successful, redirecting to:', data.url);
         window.location.href = data.url;
       } else {
-        console.error('Checkout error:', data.error);
+        console.error('[frontend] ❌ Checkout error:', data.error);
         alert('Błąd podczas tworzenia sesji płatności. Spróbuj ponownie.');
       }
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('[frontend] ❌ Checkout error:', error);
       alert('Błąd połączenia. Sprawdź połączenie internetowe i spróbuj ponownie.');
     }
   };

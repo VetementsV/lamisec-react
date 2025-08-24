@@ -131,36 +131,55 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    // Log the incoming request for debugging
+    console.log('[lamisec] 📥 Checkout request:', {
+      method: req.method,
+      headers: req.headers,
+      body: req.body,
+      timestamp: new Date().toISOString()
+    });
+
     // Parse and validate request body
     const { product, areaM2, kg, unit } = req.body;
 
+    // Log parsed values
+    console.log('[lamisec] 🔍 Parsed values:', { product, areaM2, kg, unit });
+
     // Validate product
     if (!product || !['szklo', 'marmur'].includes(product)) {
+      console.log('[lamisec] ❌ Invalid product:', product);
       return res.status(400).json({ error: 'Invalid product type. Must be "szklo" or "marmur"' });
     }
 
     // Validate unit
     if (!unit || !['m2', 'kg'].includes(unit)) {
+      console.log('[lamisec] ❌ Invalid unit:', unit);
       return res.status(400).json({ error: 'Invalid unit. Must be "m2" or "kg"' });
     }
 
     // XOR validation: exactly one of areaM2 or kg must be provided
     if (unit === 'm2' && (!areaM2 || areaM2 <= 0 || areaM2 > 10000)) {
+      console.log('[lamisec] ❌ Invalid areaM2:', areaM2);
       return res.status(400).json({ error: 'Invalid area. Must be between 0.1 and 10000 m²' });
     }
     
     if (unit === 'kg' && (!kg || kg <= 0 || kg > 10000 || !Number.isInteger(kg))) {
+      console.log('[lamisec] ❌ Invalid kg:', kg);
       return res.status(400).json({ error: 'Invalid kg amount. Must be an integer between 1 and 10000 kg' });
     }
 
     // Ensure only one value is provided
     if (unit === 'm2' && kg !== undefined) {
+      console.log('[lamisec] ❌ Both areaM2 and kg provided:', { areaM2, kg });
       return res.status(400).json({ error: 'Cannot provide both areaM2 and kg' });
     }
     
     if (unit === 'kg' && areaM2 !== undefined) {
+      console.log('[lamisec] ❌ Both areaM2 and kg provided:', { areaM2, kg });
       return res.status(400).json({ error: 'Cannot provide both areaM2 and kg' });
     }
+
+    console.log('[lamisec] ✅ Validation passed, proceeding with calculation...');
 
     let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     let metadata: Record<string, any> = {};
@@ -172,6 +191,10 @@ export default async function handler(req: any, res: any) {
         const requiredKg = areaM2 * PRICING.glass.consumption;
         const packaging = computeGlassPackaging(requiredKg);
         const pricePerM2 = areaM2 > 0 ? packaging.materialNet / areaM2 : 0;
+
+        console.log('[lamisec] 🧮 Glass m2 calculation:', {
+          areaM2, requiredKg, packaging, pricePerM2
+        });
 
         lineItems.push({
           price_data: {
@@ -212,6 +235,10 @@ export default async function handler(req: any, res: any) {
         // Glass calculation by kg
         const normalizedKg = Math.ceil(kg);
         const packaging = computeGlassPackaging(normalizedKg);
+
+        console.log('[lamisec] 🧮 Glass kg calculation:', {
+          kg, normalizedKg, packaging
+        });
 
         lineItems.push({
           price_data: {
@@ -256,6 +283,10 @@ export default async function handler(req: any, res: any) {
         const brutto = materialNet + vat;
         const pricePerM2 = areaM2 > 0 ? materialNet / areaM2 : 0;
 
+        console.log('[lamisec] 🧮 Marble m2 calculation:', {
+          areaM2, requiredKg, materialNet, vat, brutto, pricePerM2
+        });
+
         lineItems.push({
           price_data: {
             currency: 'pln',
@@ -298,6 +329,10 @@ export default async function handler(req: any, res: any) {
         const vat = materialNet * VAT_RATE;
         const brutto = materialNet + vat;
 
+        console.log('[lamisec] 🧮 Marble kg calculation:', {
+          kg, normalizedKg, materialNet, vat, brutto
+        });
+
         lineItems.push({
           price_data: {
             currency: 'pln',
@@ -334,6 +369,12 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    console.log('[lamisec] 🎯 Final data:', {
+      lineItems,
+      metadata,
+      computedData
+    });
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -345,10 +386,20 @@ export default async function handler(req: any, res: any) {
       currency: 'pln',
     });
 
+    console.log('[lamisec] ✅ Stripe session created:', {
+      sessionId: session.id,
+      url: session.url
+    });
+
     // Return session URL
     res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error('Checkout error:', error);
+    console.error('[lamisec] ❌ Checkout error:', error);
+    console.error('[lamisec] ❌ Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
     res.status(500).json({ error: 'Internal server error' });
   }
 }
