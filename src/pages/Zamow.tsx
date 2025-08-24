@@ -27,6 +27,7 @@ const Zamow = () => {
   const [results, setResults] = useState<PackagingResult | null>(null);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string>('');
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Debounce area input to prevent thrashing
@@ -36,17 +37,21 @@ const Zamow = () => {
   const validateInputs = useCallback(() => {
     if (!debouncedArea || debouncedArea <= 0) {
       setValidationError('Podaj powierzchnię w m²');
+      setIsFormValid(false);
       return false;
     }
     if (debouncedArea > 10000) {
       setValidationError('Powierzchnia nie może przekraczać 10 000 m²');
+      setIsFormValid(false);
       return false;
     }
     if (!material) {
       setValidationError('Wybierz produkt');
+      setIsFormValid(false);
       return false;
     }
     setValidationError('');
+    setIsFormValid(true);
     return true;
   }, [debouncedArea, material]);
 
@@ -101,7 +106,7 @@ const Zamow = () => {
   };
 
   const handleCheckout = async () => {
-    if (!results || !validateInputs()) return;
+    if (!results || !isFormValid) return;
     
     try {
       const response = await fetch('/api/checkout', {
@@ -146,7 +151,6 @@ const Zamow = () => {
     }
   };
 
-  const isFormValid = validateInputs();
   const showResults = results && isFormValid;
 
   return (

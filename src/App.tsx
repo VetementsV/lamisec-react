@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ScrollToTop from './components/ScrollToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import Produkty from './pages/Produkty';
 import Szklo from './pages/Szklo';
@@ -25,7 +26,11 @@ function App() {
             <Route path="/produkty/szklo" element={<Szklo />} />
             <Route path="/produkty/marmur" element={<Marmur />} />
             <Route path="/technologia" element={<Technologia />} />
-            <Route path="/zamow" element={<Zamow />} />
+            <Route path="/zamow" element={
+              <ErrorBoundary>
+                <Zamow />
+              </ErrorBoundary>
+            } />
             <Route path="/kontakt" element={<Kontakt />} />
             <Route path="/sukces" element={<Sukces />} />
             <Route path="/anulowano" element={<Anulowano />} />
