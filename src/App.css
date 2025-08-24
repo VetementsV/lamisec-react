@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Account for fixed navbar */
+}
+
 :root {
   --primary-color: #2e84a7;
   --primary-dark: #1e5a7a;
