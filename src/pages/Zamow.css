@@ -93,6 +93,47 @@
   display: block;
 }
 
+/* Unit Toggle */
+.unit-toggle {
+  display: flex;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.unit-btn {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.unit-btn:hover {
+  background: #f8f9fa;
+  color: #2e84a7;
+}
+
+.unit-btn.active {
+  background: #2e84a7;
+  color: #fff;
+}
+
+.unit-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 132, 167, 0.1);
+}
+
+.unit-btn:focus-visible {
+  outline: 2px solid #2e84a7;
+  outline-offset: 2px;
+}
+
 /* Checkbox Styles */
 .checkbox-label {
   display: flex;

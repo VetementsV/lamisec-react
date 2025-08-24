@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Technologia.css';
 
 const Technologia = () => {
@@ -131,12 +132,12 @@ const Technologia = () => {
             kompletne instrukcje aplikacji dla konkretnego zastosowania.
           </p>
           <div className="cta-buttons">
-            <a href="/kontakt" className="btn btn-primary">
+            <Link to="/kontakt" className="btn btn-primary">
               Skontaktuj się z nami
-            </a>
-            <a href="/zamow" className="btn btn-secondary">
+            </Link>
+            <Link to="/zamow" className="btn btn-secondary">
               Oblicz koszty
-            </a>
+            </Link>
           </div>
         </div>
       </div>

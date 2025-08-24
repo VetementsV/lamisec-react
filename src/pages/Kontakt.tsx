@@ -43,7 +43,7 @@ const Kontakt = () => {
                 <i className="fab fa-whatsapp"></i>
                 WhatsApp
               </a>
-              <a href="https://t.me/lamisec" className="messenger-btn telegram">
+              <a href="tel:+380682837200" className="messenger-btn telegram">
                 <i className="fab fa-telegram"></i>
                 Telegram
               </a>

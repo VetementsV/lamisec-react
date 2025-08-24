@@ -23,6 +23,8 @@ function useDebounce<T>(value: T, delay: number): T {
 
 const Zamow = () => {
   const [area, setArea] = useState<number>(1);
+  const [kg, setKg] = useState<number>(1);
+  const [unit, setUnit] = useState<'m2' | 'kg'>('m2');
   const [material, setMaterial] = useState<'glass' | 'marble'>('glass');
   const [results, setResults] = useState<PackagingResult | null>(null);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
@@ -30,30 +32,46 @@ const Zamow = () => {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Debounce area input to prevent thrashing
+  // Debounce inputs to prevent thrashing
   const debouncedArea = useDebounce(area, 300);
+  const debouncedKg = useDebounce(kg, 300);
 
   // Validation function
   const validateInputs = useCallback(() => {
-    if (!debouncedArea || debouncedArea <= 0) {
-      setValidationError('Podaj powierzchnię w m²');
-      setIsFormValid(false);
-      return false;
+    if (unit === 'm2') {
+      if (!debouncedArea || debouncedArea <= 0) {
+        setValidationError('Podaj powierzchnię w m²');
+        setIsFormValid(false);
+        return false;
+      }
+      if (debouncedArea > 10000) {
+        setValidationError('Powierzchnia nie może przekraczać 10 000 m²');
+        setIsFormValid(false);
+        return false;
+      }
+    } else {
+      if (!debouncedKg || debouncedKg <= 0) {
+        setValidationError('Podaj ilość w kg');
+        setIsFormValid(false);
+        return false;
+      }
+      if (debouncedKg > 10000) {
+        setValidationError('Ilość nie może przekraczać 10 000 kg');
+        setIsFormValid(false);
+        return false;
+      }
     }
-    if (debouncedArea > 10000) {
-      setValidationError('Powierzchnia nie może przekraczać 10 000 m²');
-      setIsFormValid(false);
-      return false;
-    }
+    
     if (!material) {
       setValidationError('Wybierz produkt');
       setIsFormValid(false);
       return false;
     }
+    
     setValidationError('');
     setIsFormValid(true);
     return true;
-  }, [debouncedArea, material]);
+  }, [debouncedArea, debouncedKg, unit, material]);
 
   // Calculate function
   const calculate = useCallback(() => {
@@ -67,10 +85,32 @@ const Zamow = () => {
         let result: PackagingResult;
         
         if (material === 'glass') {
-          const requiredKg = debouncedArea * PRICING.glass.consumption;
-          result = computePackaging(requiredKg, debouncedArea, true); // VAT always applied
+          if (unit === 'm2') {
+            const requiredKg = debouncedArea * PRICING.glass.consumption;
+            result = computePackaging(requiredKg, debouncedArea, true);
+          } else {
+            // Use kg directly for glass packaging
+            result = computePackaging(debouncedKg, 0, true);
+          }
         } else {
-          result = computeMarblePackaging(debouncedArea, true); // VAT always applied
+          if (unit === 'm2') {
+            result = computeMarblePackaging(debouncedArea, true);
+          } else {
+            // Use kg directly for marble
+            const materialNet = debouncedKg * PRICING.marble.pricePerKg;
+            const vat = materialNet * 0.23;
+            const brutto = materialNet + vat;
+            result = {
+              n20: 0,
+              n5: 0,
+              n1: 0,
+              totalKg: debouncedKg,
+              materialNet,
+              vat,
+              brutto,
+              pricePerM2: 0
+            };
+          }
         }
         
         setResults(result);
@@ -81,7 +121,7 @@ const Zamow = () => {
         setIsCalculating(false);
       }
     }, 200);
-  }, [debouncedArea, material, validateInputs]);
+  }, [debouncedArea, debouncedKg, unit, material, validateInputs]);
 
   // Auto-calculate when inputs change
   useEffect(() => {
@@ -90,7 +130,7 @@ const Zamow = () => {
     } else {
       setResults(null);
     }
-  }, [debouncedArea, material, calculate, validateInputs]);
+  }, [debouncedArea, debouncedKg, unit, material, calculate, validateInputs]);
 
   const formatCurrency = (amount: number) => {
     if (typeof amount !== 'number' || isNaN(amount)) return '0.00 PLN';
@@ -116,7 +156,9 @@ const Zamow = () => {
         },
         body: JSON.stringify({
           product: material === 'glass' ? 'szklo' : 'marmur',
-          areaM2: debouncedArea,
+          areaM2: unit === 'm2' ? debouncedArea : 0,
+          kg: unit === 'kg' ? debouncedKg : 0,
+          unit: unit,
         }),
       });
 
@@ -145,9 +187,13 @@ const Zamow = () => {
 
   const getInfoNote = () => {
     if (material === 'glass') {
-      return 'Zakres zużycia szkła: 80–100 g/m² (używamy 90 g/m²)';
+      return unit === 'm2' 
+        ? 'Zakres zużycia szkła: 80–100 g/m² (używamy 90 g/m²)'
+        : 'Dostępne opakowania: 1kg, 5kg, 20kg';
     } else {
-      return 'Zużycie marmuru: 350 g/m² (używamy 350 g/m²)';
+      return unit === 'm2'
+        ? 'Zużycie marmuru: 350 g/m² (używamy 350 g/m²)'
+        : 'Cena: 85 PLN/kg (NET) + VAT 23%';
     }
   };
 
@@ -165,15 +211,44 @@ const Zamow = () => {
           {/* Left side - Form */}
           <div className="calculator-form">
             <div className="form-group">
-              <label htmlFor="surface-area">Powierzchnia (m²):</label>
+              <label>Jednostka:</label>
+              <div className="unit-toggle">
+                <button
+                  type="button"
+                  className={`unit-btn ${unit === 'm2' ? 'active' : ''}`}
+                  onClick={() => setUnit('m2')}
+                >
+                  m²
+                </button>
+                <button
+                  type="button"
+                  className={`unit-btn ${unit === 'kg' ? 'active' : ''}`}
+                  onClick={() => setUnit('kg')}
+                >
+                  kg
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="input-value">
+                {unit === 'm2' ? 'Powierzchnia (m²):' : 'Ilość (kg):'}
+              </label>
               <input
                 type="number"
-                id="surface-area"
-                min="0.1"
-                step="0.1"
-                value={area}
-                onChange={(e) => setArea(parseFloat(e.target.value) || 0)}
-                placeholder="Wprowadź powierzchnię"
+                id="input-value"
+                min={unit === 'm2' ? 0.1 : 1}
+                step={unit === 'm2' ? 0.1 : 1}
+                value={unit === 'm2' ? area : kg}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  if (unit === 'm2') {
+                    setArea(value);
+                  } else {
+                    setKg(Math.floor(value)); // Ensure integer for kg
+                  }
+                }}
+                placeholder={unit === 'm2' ? 'Wprowadź powierzchnię' : 'Wprowadź ilość'}
                 className={`form-input ${validationError && !isFormValid ? 'error' : ''}`}
                 aria-describedby={validationError ? 'validation-hint' : undefined}
               />
@@ -223,7 +298,7 @@ const Zamow = () => {
             {!isCalculating && !showResults && (
               <div className="no-results">
                 <i className="fas fa-calculator"></i>
-                <p>Wprowadź powierzchnię i wybierz produkt, aby zobaczyć wyniki</p>
+                <p>Wprowadź {unit === 'm2' ? 'powierzchnię' : 'ilość'} i wybierz produkt, aby zobaczyć wyniki</p>
               </div>
             )}
 
@@ -234,7 +309,14 @@ const Zamow = () => {
                   <span className="result-value">{results.totalKg || 0} kg</span>
                 </div>
 
-                {material === 'glass' && (
+                {material === 'glass' && unit === 'm2' && (
+                  <div className="result-item">
+                    <span className="result-label">Sugerowane opakowania:</span>
+                    <span className="result-value">{formatPackaging(results.n20 || 0, results.n5 || 0, results.n1 || 0)}</span>
+                  </div>
+                )}
+
+                {material === 'glass' && unit === 'kg' && (
                   <div className="result-item">
                     <span className="result-label">Sugerowane opakowania:</span>
                     <span className="result-value">{formatPackaging(results.n20 || 0, results.n5 || 0, results.n1 || 0)}</span>
@@ -256,10 +338,12 @@ const Zamow = () => {
                   <span className="result-value">{formatCurrency(results.brutto || 0)}</span>
                 </div>
 
-                <div className="result-item">
-                  <span className="result-label">Cena za m²:</span>
-                  <span className="result-value">{formatCurrency(results.pricePerM2 || 0)}</span>
-                </div>
+                {unit === 'm2' && (
+                  <div className="result-item">
+                    <span className="result-label">Cena za m²:</span>
+                    <span className="result-value">{formatCurrency(results.pricePerM2 || 0)}</span>
+                  </div>
+                )}
 
                 <div className="calculator-actions">
                   <button
