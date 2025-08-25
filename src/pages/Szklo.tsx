@@ -15,7 +15,7 @@ const Szklo = () => {
 
         <div className="product-overview">
           <div className="product-image">
-            <img src="images/szklo.jpg" alt="LamiSec - ochrona szkła/okien" />
+            <img src="/images/szklo.jpg" alt="LamiSec - ochrona szkła/okien" />
           </div>
           <div className="product-info">
             <h2>Ochrona Szkła i Okien</h2>
