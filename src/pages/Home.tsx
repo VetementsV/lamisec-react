@@ -1,9 +1,24 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import './Home.css';
 
 const Home = () => {
+  const { search } = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    if (params.get("s") === "produkty") {
+      const productsSection = document.getElementById("produkty");
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: "smooth" });
+      }
+      // Remove param from URL
+      window.history.replaceState({}, "", "/");
+    }
+  }, [search]);
+
   const scrollToProducts = () => {
-    const productsSection = document.querySelector('.product');
+    const productsSection = document.getElementById('produkty');
     if (productsSection) {
       productsSection.scrollIntoView({ behavior: 'smooth' });
     }
@@ -37,7 +52,7 @@ const Home = () => {
       </section>
 
       {/* Product Information Section */}
-      <section className="product">
+      <section id="produkty" className="product">
         <div className="container">
           <h2 className="section-title">Produkty LamiSec</h2>
           <div className="product-grid">

@@ -44,3 +44,4 @@ export const calculateVAT = (netAmount: number): number => {
 export const calculateBrutto = (netAmount: number): number => {
   return netAmount + calculateVAT(netAmount);
 };
+

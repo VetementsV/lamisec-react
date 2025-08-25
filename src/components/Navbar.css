@@ -81,6 +81,39 @@
   border-radius: 1px;
 }
 
+.navbar-nav button {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: relative;
+  background: none;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.navbar-nav button:hover {
+  color: #2e84a7;
+}
+
+.navbar-nav button.active {
+  color: #2e84a7;
+}
+
+.navbar-nav button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #2e84a7;
+  border-radius: 1px;
+}
+
 .navbar-toggle {
   display: none;
   background: none;
@@ -161,6 +194,28 @@ body.no-scroll {
   }
   
   .navbar-nav a.active {
+    color: #2e84a7;
+    font-weight: 600;
+  }
+  
+  .navbar-nav button {
+    display: block;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .navbar-nav button:last-child {
+    border-bottom: none;
+  }
+  
+  .navbar-nav button.active::after {
+    display: none;
+  }
+  
+  .navbar-nav button.active {
     color: #2e84a7;
     font-weight: 600;
   }

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const menuRef = useRef<HTMLUListElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
 
@@ -69,6 +70,22 @@ const Navbar = () => {
     }
   };
 
+  const handleProduktyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    closeMenu();
+    
+    if (location.pathname === '/') {
+      // If already on home page, scroll to products section
+      const productsSection = document.getElementById('produkty');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // Navigate to home with scroll parameter
+      navigate('/?s=produkty');
+    }
+  };
+
   const isActive = (path: string) => {
     if (path === '/') {
       return location.pathname === '/';
@@ -115,14 +132,14 @@ const Navbar = () => {
             </Link>
           </li>
           <li role="none">
-            <Link 
-              to="/produkty" 
-              onClick={closeMenu} 
+            <button 
+              onClick={handleProduktyClick} 
               className={isActive('/produkty') ? 'active' : ''}
               role="menuitem"
+              type="button"
             >
               Produkty
-            </Link>
+            </button>
           </li>
           <li role="none">
             <Link 

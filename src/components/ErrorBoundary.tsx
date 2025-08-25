@@ -1,48 +1,63 @@
-import React from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {error: any}> {
-  constructor(props: any) { 
-    super(props); 
-    this.state = { error: null }; 
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
   }
-  
-  static getDerivedStateFromError(error: any) { 
-    return { error }; 
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
   }
-  
-  componentDidCatch(error: any, info: any) { 
-    console.error('[zamow] crash', error, info); 
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Log to console for debugging
+    console.group('🚨 React Error Boundary');
+    console.error('Error:', error);
+    console.error('Error Info:', errorInfo);
+    console.error('Component Stack:', errorInfo.componentStack);
+    console.groupEnd();
   }
-  
-  render() { 
-    if (this.state.error) {
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
       return (
-        <div style={{
-          padding: '2rem',
-          background: '#fee',
-          border: '1px solid #fcc',
-          borderRadius: '8px',
-          margin: '1rem',
-          color: '#c33'
-        }}>
-          <h3>Błąd na stronie zamówienia</h3>
-          <p>Wystąpił błąd podczas ładowania strony. Spróbuj odświeżyć stronę.</p>
-          <details style={{ marginTop: '1rem' }}>
-            <summary>Szczegóły błędu (dla programistów)</summary>
-            <pre style={{ 
-              background: '#f5f5f5', 
-              padding: '1rem', 
-              borderRadius: '4px',
-              overflow: 'auto',
-              fontSize: '0.875rem'
-            }}>
-              {this.state.error.toString()}
-            </pre>
-          </details>
+        <div className="error-boundary">
+          <div className="error-container">
+            <h2>Coś poszło nie tak</h2>
+            <p>Wystąpił nieoczekiwany błąd. Spróbuj odświeżyć stronę.</p>
+            <button 
+              onClick={() => this.setState({ hasError: false })}
+              className="btn btn-primary"
+            >
+              Spróbuj ponownie
+            </button>
+            <details>
+              <summary>Szczegóły błędu</summary>
+              <pre>{this.state.error?.message}</pre>
+            </details>
+          </div>
         </div>
       );
     }
-    return this.props.children; 
+
+    return this.props.children;
   }
 }
 

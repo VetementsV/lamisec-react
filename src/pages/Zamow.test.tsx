@@ -82,3 +82,4 @@ describe('Zamow Component', () => {
     expect(screen.getByRole('button', { name: /przejdź do płatności/i })).toBeInTheDocument();
   });
 });
+
