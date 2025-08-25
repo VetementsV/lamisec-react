@@ -14,7 +14,7 @@ const Kontakt = () => {
             <div className="contact-item">
               <i className="fas fa-phone"></i>
               <div>
-                <h4>Sprzedaż biurowa</h4>
+                <h4>Biuro Sprzedaży</h4>
                 <p>+48 669 484 039</p>
               </div>
             </div>

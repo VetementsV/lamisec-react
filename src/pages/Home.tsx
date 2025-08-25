@@ -153,9 +153,9 @@ const Home = () => {
           <div className="contact-content">
             <div className="contact-info">
               <h3>Biuro Sprzedaży</h3>
-              <p><i className="fas fa-phone"></i> +48 22 123 45 67</p>
-              <p><i className="fas fa-envelope"></i> biuro@lamisec.pl</p>
-              <p><i className="fas fa-map-marker-alt"></i> ul. Przykładowa 123, 00-000 Warszawa</p>
+              <p><i className="fas fa-phone"></i>+48 669 484 039</p>
+              <p><i className="fas fa-envelope"></i>kontakt@lamisec.pl</p>
+              <p><i className="fas fa-map-marker-alt"></i>Tokarnia 490, 32-436 Tokarnia</p>
             </div>
             <div className="contact-cta">
               <p>Potrzebujesz profesjonalnej porady?</p>
