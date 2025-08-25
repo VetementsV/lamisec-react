@@ -140,7 +140,7 @@ const Home = () => {
               </ul>
             </div>
             <div className="sustainability-image">
-              <img src="/images/background_mainpage.jpg" alt="Zrównoważony rozwój LamiSec" />
+              <img src="/images/ekologia.png" alt="Zrównoważony rozwój LamiSec" />
             </div>
           </div>
         </div>

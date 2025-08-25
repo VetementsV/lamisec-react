@@ -20,7 +20,7 @@ const Szklo = () => {
           <div className="product-info">
             <h2>Ochrona Szkła i Okien</h2>
             <p>
-              LamiSec to specjalistyczny materiał ochronny, który tworzy niewidzialną warstwę 
+              LamiSec to specjalistyczny mdateriał ochronny, który tworzy niewidzialną warstwę 
               zabezpieczającą powierzchnie szklane przed uszkodzeniami mechanicznymi, 
               zanieczyszczeniami i wpływami atmosferycznymi.
             </p>
