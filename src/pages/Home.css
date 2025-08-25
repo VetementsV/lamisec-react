@@ -73,6 +73,27 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* Background Image Section */
+.background-image-section {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.background-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background-image-container img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+}
+
 /* Product Section */
 .product {
   padding: 80px 0;

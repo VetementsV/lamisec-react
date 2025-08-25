@@ -51,6 +51,13 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Background Image Section */}
+      <section className="background-image-section">
+        <div className="background-image-container">
+          <img src="/images/background.png" alt="LamiSec Background" />
+        </div>
+      </section>
+
       {/* Product Information Section */}
       <section id="produkty" className="product">
         <div className="container">
