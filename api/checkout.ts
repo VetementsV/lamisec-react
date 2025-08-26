@@ -3,6 +3,7 @@ import Stripe from "stripe";
 // Validate environment variables
 const requiredEnvVars = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  EXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.EXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   BASE_URL: process.env.BASE_URL,
 };
