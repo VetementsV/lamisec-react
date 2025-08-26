@@ -56,7 +56,7 @@ const Kontakt = () => {
               <a href="#" className="social-link">
                 <i className="fab fa-instagram"></i>
               </a>
-              <a href="#" className="social-link">
+              <a href="https://www.facebook.com/people/LamiSec/61579196025674/" className="social-link">
                 <i className="fab fa-facebook"></i>
               </a>
               <a href="#" className="social-link">
